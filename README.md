@@ -1,2 +1,2 @@
 # Compiler
-This repository contains the source code for my compiler. This compiler was written for my BSc research project as part of my degree at the University of Kent. 
+This repository contains the source code for my compiler. I have also included source files for the language that is being compiled. The language I am compiling is of my own devising. This compiler was written for my BSc research project as part of my degree at the University of Kent. 
