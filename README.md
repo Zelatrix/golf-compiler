@@ -3,3 +3,4 @@ This repository contains the source code for my compiler. I have also included s
 
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
+- https://tomassetti.me/ebnf/
