@@ -1,0 +1,2 @@
+// A program testing comments and division by zero
+!(1 / 0)
