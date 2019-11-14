@@ -1,6 +1,8 @@
 from llvmlite import ir, binding 
 
-class CodeGen():
+
+class CodeGen:
+# Initialise all the necessary variables that are used by LLVM
     def __init__(self):
         self.binding = binding
         self.binding.initialize()
@@ -10,10 +12,11 @@ class CodeGen():
         self._create_execution_engine()
         self._declare_print_function()
 
+# Configure LLVM with the required parameters.
     def _config_llvm(self):
         self.module = ir.Module(name=__file__)
         self.module.triple = self.binding.get_default_triple()
-        func_type = ir.Function(ir.VoidType(), [], False)
+        func_type = ir.FunctionType(ir.VoidType(), [])
         base_func = ir.Function(self.module, func_type, name="main")
         block = base_func.append_basic_block(name="entry")
         self.builder = ir.IRBuilder(block)
@@ -25,6 +28,7 @@ class CodeGen():
         engine = binding.create_mcjit_compiler(backing_mod, target_machine)
         self.engine = engine
 
+# Declare the function that is used for printing text to the console.
     def _declare_print_function(self):
         voidptr_ty = ir.IntType(8).as_pointer()
         printf_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
@@ -41,3 +45,11 @@ class CodeGen():
         self.engine.run_static_constructors()
         return mod
 
+# Create and save the .ll file that contains the intermediate
+# representation for the compiled program
+    def create_ir(self):
+        self._compile_ir()
+
+    def save_ir(self, filename):
+        with open(filename, "w") as output_file:
+            output_file.write(str(self.module))
