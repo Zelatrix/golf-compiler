@@ -1,0 +1,3 @@
+// print(5 and 6);
+// print(5 or 6);
+print(5 not 6);
