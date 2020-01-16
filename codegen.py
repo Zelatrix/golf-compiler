@@ -11,6 +11,7 @@ class CodeGen:
         self._config_llvm()
         self._create_execution_engine()
         self._declare_print_function()
+        self.alloca = self.builder.alloca(ir.IntType(64), 1)
 
 # Configure LLVM with the required parameters.
     def _config_llvm(self):

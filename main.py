@@ -13,12 +13,12 @@ def golf_mode():
         print("File too long!")
         print("In Golf mode, files musy not exceed 50000 characters!")
         exit()
-        
+
 
 # Finding the source file in the directory tree
 def find_file():
     file_arg = sys.argv[1]
-    p = Path("D:\\Coding\\Languages\\Imperative Languages\\Python\\Compilers and Interpreters\\Compilers\\Golf Compiler\\golf_files")
+    p = Path("golf_files")
     for file in p.glob("*"):
         if file.name == file_arg:
             # Change directory
@@ -29,33 +29,33 @@ def find_file():
 
 
 text_input = find_file()
+print(text_input)
 
 # Creating a lexer and passing the source code into it
 lexer = Lexer().get_lexer()
 tokens = lexer.lex(text_input)
 
-for tok in tokens:
-    print(tok)
+#for tok in tokens:
+#    print(tok)
 
 # Create a code generator object
-# codegen = CodeGen()
+codegen = CodeGen()
 
 # Assign the variables to the code generator
-# module = codegen.module
-# builder = codegen.builder
-# printf = codegen.printf
+module = codegen.module
+builder = codegen.builder
+printf = codegen.printf
 
 # Create a parser object and parse the list of tokens created by the lexer.
-# pg = Parser()
-# pg = Parser(module, builder, printf)
-# pg.parse()
-# parser = pg.get_parser()
-# parser.parse(tokens).eval()
+pg = Parser(module, builder, printf)
+pg.parse()
+parser = pg.get_parser()
+parser.parse(tokens).eval()
 
 # Save the IR representation into an LL file
-# codegen.create_ir()
-# os.chdir("..")
-# codegen.save_ir("output.ll")
+codegen.create_ir()
+os.chdir("..")
+codegen.save_ir("output.ll")
 
 if sys.argv[2] == "--golf":
     golf_mode()

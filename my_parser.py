@@ -1,7 +1,7 @@
 from rply import ParserGenerator
-from ast import Integer, Float, Char, String, Bool
+from ast import Integer, Float, Char, String, Boolean
 from ast import Sum, Sub, Mult, Div, Modulus
-from ast import Equal, Less, LessEqual, Greater, GreatEqual
+from ast import Equal, Less, LessEqual, Greater, GreaterEqual
 from ast import Print
 
 import re
@@ -28,13 +28,13 @@ class Parser():
 
         # Flatten the nested list of tokens
         flatTokens = [val for sublist in tokenList for val in sublist]
-        
+
         #Rules of precedence for the operators
         precedence = [('left', ['PLUS', 'MINUS']), ('left', ['STAR', 'SLASH'])
                       # ('left', [])('left', [])
                       # ('left', [])('left', [])
                      ]
-        
+
         self.pg = ParserGenerator(flatTokens, precedence)
         self.module = module
         self.builder = builder
@@ -45,29 +45,29 @@ class Parser():
         # @self.pg.production('program : statement_list')
         # @self.pg.production('statement_list : statement (statement_list SEMICOLON| SEMICOLON)')
         # @self.pg.production('statement : PRINT LEFT_PAR expr RIGHT_PAR')
-        
+
         # @self.pg.production('stmt : statement SEMICOLON stmt')
         # @self.pg.production('stmt : statement SEMICOLON')
         # def stmt(p):
-            # while True:    
+            # while True:
             #     if token == 'SEMICOLON':
             #         break
             #     else:
-            #         continue 
-        
+            #         continue
+
         # The main program
         @self.pg.production('program : PRINT LEFT_PAR expr RIGHT_PAR SEMICOLON')
         def program(p):
             return Print(self.builder, self.module, self.printf, p[2])
-        
+
         # Numbers
         @self.pg.production('expr : INT')
-        @self.pg.production('expr : FLOAT') 
+        @self.pg.production('expr : FLOAT')
         def number(p):
             num = p[0]
             if num.gettokentype() == "INT":
                 return Integer(self.builder, self.module, p[0].value)
-            elif num.gettokentype() == "FLOAT":    
+            elif num.gettokentype() == "FLOAT":
                 return Float(self.builder, self.module, p[0].value)
 
         # Strings/Chars
@@ -148,8 +148,8 @@ class Parser():
         @self.pg.production('expr : VAR IDENTIFIER SEMICOLON')
         @self.pg.production('expr : VAR IDENTIFIER ASSIGN expr SEMICOLON')
         def var_expr(p):
-            pass 
-        
+            pass
+
         # Parsing an if statement
         @self.pg.production('expr : IF expr THEN COLON')
         def if_stmt(p):
@@ -165,7 +165,7 @@ class Parser():
         @self.pg.production('expr : FUNCTION LEFT_PAR expr RIGHT_PAR COLON')
         def function(p):
             pass
-        
+
         # Error handling
         @self.pg.error
         def error_handle(token):
