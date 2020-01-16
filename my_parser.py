@@ -42,7 +42,10 @@ class Parser():
 
     def parse(self):
         # How to parse multiple statements
+        # @self.pg.production('program : statement_list')
+        # @self.pg.production('statement_list : statement (statement_list SEMICOLON| SEMICOLON)')
         # @self.pg.production('statement : PRINT LEFT_PAR expr RIGHT_PAR')
+        
         # @self.pg.production('stmt : statement SEMICOLON stmt')
         # @self.pg.production('stmt : statement SEMICOLON')
         # def stmt(p):
