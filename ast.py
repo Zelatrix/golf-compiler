@@ -85,7 +85,7 @@ class Div(BinaryOp):
 # Defining the modulo operation
 class Modulus(BinaryOp):
     def eval(self):
-#         if self.right == Integer(str(0)) or self.right == Float(str(0.0)): 
+#         if self.right == Integer(str(0)) or self.right == Float(str(0.0)):
 #             raise ZeroDivisionError("You cannot take the remainder of a division by zero!")
 #         else:
             i = self.builder.srem(self.left.eval(), self.right.eval())
@@ -153,10 +153,10 @@ class Char:
 class Variable:
     def __init__(self, ident):
         self.ident = ident
-    
+
     def eval(self):
         pass
-    
+
 # class Loop:
 #     def __init__(self):
 #         pass
@@ -188,6 +188,19 @@ class Variable:
 #         self.value = value
 
 
+class Sequence:
+    def __init__(self, builder, module, printf, first, next):
+        self.printf = printf
+        self.builder = builder
+        self.module = module
+        self.first = first
+        self.next = next
+
+    def eval(self):
+        self.first.eval()
+        self.next.eval()
+
+
 # Defining the print function
 class Print:
     def __init__(self, builder, module, printf, value):
@@ -195,18 +208,20 @@ class Print:
         self.builder = builder
         self.module = module
         self.value = value
+        self.initialised = False
 
     # Evaluating the print function in LLVM
     def eval(self):
+        if (not(self.initialised)):
+            voidptr_ty = ir.IntType(64).as_pointer()
+            fmt = "%i \n\0"
+            c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)), bytearray(fmt.encode("utf8")))
+            global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
+            global_fmt.linkage = 'internal'
+            global_fmt.global_constant = True
+            global_fmt.initializer = c_fmt
+            self.fmt_arg = self.builder.bitcast(global_fmt, voidptr_ty)
+            self.initialised = True
+
         value = self.value.eval()
-
-        voidptr_ty = ir.IntType(64).as_pointer()
-        fmt = "%i \n\0"
-        c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)), bytearray(fmt.encode("utf8")))
-        global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
-        global_fmt.linkage = 'internal'
-        global_fmt.global_constant = True
-        global_fmt.initializer = c_fmt
-        fmt_arg = self.builder.bitcast(global_fmt, voidptr_ty)
-
-        self.builder.call(self.printf, [fmt_arg, value])
+        self.builder.call(self.printf, [self.fmt_arg, value])

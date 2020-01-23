@@ -2,7 +2,7 @@ from rply import ParserGenerator
 from ast import Integer, Float, Char, String, Boolean
 from ast import Sum, Sub, Mult, Div, Modulus
 from ast import Equal, Less, LessEqual, Greater, GreaterEqual
-from ast import Print
+from ast import Print, Sequence
 
 import re
 
@@ -41,24 +41,31 @@ class Parser():
         self.printf = printf
 
     def parse(self):
+        # The main program
+        @self.pg.production('program : statementList')
+        def program(p):
+            return p[0]
+
         # How to parse multiple statements
         # @self.pg.production('program : statement_list')
         # @self.pg.production('statement_list : statement (statement_list SEMICOLON| SEMICOLON)')
-        # @self.pg.production('statement : PRINT LEFT_PAR expr RIGHT_PAR')
-
-        # @self.pg.production('stmt : statement SEMICOLON stmt')
-        # @self.pg.production('stmt : statement SEMICOLON')
-        # def stmt(p):
-            # while True:
-            #     if token == 'SEMICOLON':
-            #         break
-            #     else:
-            #         continue
-
-        # The main program
-        @self.pg.production('program : PRINT LEFT_PAR expr RIGHT_PAR SEMICOLON')
-        def program(p):
+        @self.pg.production('statement : PRINT LEFT_PAR expr RIGHT_PAR')
+        def statement(p):
+            print("got print")
             return Print(self.builder, self.module, self.printf, p[2])
+
+        @self.pg.production('statementList : statement SEMICOLON statementList')
+        def stmt(p):
+            return Sequence(self.builder, self.module, self.printf, p[0], p[2])
+             #while True:
+             #    if token == 'SEMICOLON':
+             #        break
+             #    else:
+             #        continue
+
+        @self.pg.production('statementList : ')
+        def stmtEnd(p):
+            return []
 
         # Numbers
         @self.pg.production('expr : INT')
