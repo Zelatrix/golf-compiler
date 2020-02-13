@@ -13,11 +13,15 @@ As the name suggests, the Golf language has a feature that allows the programmer
 **Version History**
 ----
 version_number: 1.0.0
+
+
 date: 10/02/20
 ---
 This version of the compiler is a very rudimentary edition, and acts like a calculator. It features all the basic arithmetic operations, including addition, subtraction, multiplication and division. It also supports the modulus operation. 
 
 version_number: 1.1.0
+
+
 date: 10/02/20
 ---
 This version of the compiler adds support for variables. It uses the LLVMlite library in Python to allocate the amount of space required on the stack for the type of variable in question, then it stores the specified value in that newly-allocated space on the stack. When the variable is required, the value is loaded into memory and returned. 
@@ -25,11 +29,15 @@ This version of the compiler adds support for variables. It uses the LLVMlite li
 Version 1.1.0 also introduces the capability to parse multiple statements from a file, so that programs longer than a single line are able to be handled by the compiler. 
 
 version_number: 1.2.0
+
+
 date: 
 ---
 
 
 version_number: 1.3.0
+
+
 date: 
 ---
 
