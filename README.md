@@ -10,7 +10,7 @@ As the name suggests, the Golf language has a feature that allows the programmer
 - Files run in golf mode must be less than 5000 characters 
 - If a file exceeds this limit, an error will be thrown and the file will refuse to compile.  
 
-**Version History**
+# Version History
 ----
 Version 1.0.0
 ---
