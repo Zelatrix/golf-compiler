@@ -21,14 +21,6 @@ This version of the compiler adds support for variables. It uses the LLVMlite li
 
 Version 1.1.0 also introduces the capability to parse multiple statements from a file, so that programs longer than a single line are able to be handled by the compiler. 
 
-Version 1.2.0 
----
-
-
-Version 1.3.0
----
-
-
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
 - https://tomassetti.me/ebnf/
