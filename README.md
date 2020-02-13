@@ -11,7 +11,6 @@ As the name suggests, the Golf language has a feature that allows the programmer
 - If a file exceeds this limit, an error will be thrown and the file will refuse to compile.  
 
 # Version History
-----
 Version 1.0.0
 ---
 This version of the compiler is a very rudimentary edition, and acts like a calculator. It features all the basic arithmetic operations, including addition, subtraction, multiplication and division. It also supports the modulus operation. 
