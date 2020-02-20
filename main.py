@@ -55,10 +55,8 @@ parser.parse(tokens)
 # Loop through the list of statements, and evaluate
 # each one.
 for stmt in parser.parse(tokens):
-    CodeGen.visit(codegen.visit_print(stmt))
+    print(stmt)
 
-#     # print(stmt)
-#     stmt.accept(CodeGen())
 # print(parser.parse(tokens))
 
 # Save the IR representation into an LL file
