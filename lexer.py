@@ -13,24 +13,19 @@ class Lexer():
         self.lexer.add("WHILE", r"while")
         self.lexer.add("IF", r"if")
         self.lexer.add("THEN", r"then")
+        self.lexer.add("ELSE", r"else")
         self.lexer.add("ARRAY", r"array")
-        self.lexer.add("PRINT", r"print")
         self.lexer.add("VAR", r"var")
+        self.lexer.add("PRINT", r"(print)")
 
         # Boolean operators
-        self.lexer.add("AND", r"(and)")
+        self.lexer.add("AND", r"and")
         self.lexer.add("OR", r"(or)")
         self.lexer.add("NOT", r"(not)")
 
-        # Types
-        self.lexer.add("INT", r"(?<!\.)\d+(?!\.)")
-        self.lexer.add("FLOAT", r"\d+\.\d+")
-        self.lexer.add("BOOL", r"(true|false)")
-        self.lexer.add("STRING", r"\".+\"")
-        self.lexer.add("CHAR", r"[A-Za-z]")
-
-        # Identifiers
-        self.lexer.add("IDENTIFIER", r"[A-Za-z_]([A-Za-z_0-9])*")
+        # True and False
+        self.lexer.add("TRUE", r"(true)")
+        self.lexer.add("FALSE", r"(false)")
 
         # Comparison
         self.lexer.add("LESS_EQUAL", r"\<\=")
@@ -38,17 +33,27 @@ class Lexer():
         self.lexer.add("EQUAL", r"\=\=")
         self.lexer.add("LESS_THAN", r"\<")
         self.lexer.add("GREATER_THAN", r"\>")
+        self.lexer.add("NOT_EQUAL", r"\/\=")
 
         # Arithmetic
         self.lexer.add("PLUS", r"\+")
         self.lexer.add("MINUS", r"\-")
         self.lexer.add("STAR", r"\*")
         self.lexer.add("SLASH", r"\/")
-        self.lexer.add("MOD", r"mod")
+        self.lexer.add("MOD", r"(mod)")
+
+        # Identifiers
+        self.lexer.add("ID", r"[A-Za-z_]([A-Za-z_0-9])*")
+
+        # Types
+        self.lexer.add("INT", r"(?<!\.)\d+(?!\.)")
+        self.lexer.add("FLOAT", r"\d+\.\d+")
+        self.lexer.add("STRING", r"\".+\"")
+        self.lexer.add("CHAR", r"[A-Za-z]")
 
         # Tokens to ignore
-        self.lexer.ignore("//.+")
-        self.lexer.ignore("\s+")
+        self.lexer.ignore(r"\/\/.+")
+        self.lexer.ignore(r"\s+")
 
         # Miscellaneous
         self.lexer.add("ASSIGN", r"\:\=")
@@ -56,6 +61,8 @@ class Lexer():
         self.lexer.add("SINGLE_QUOTE", r"\'")
         self.lexer.add("LEFT_PAR", r"\(")
         self.lexer.add("RIGHT_PAR", r"\)")
+        self.lexer.add("LEFT_BRACE", r"\[")
+        self.lexer.add("RIGHT_BRACE", r"\]")
         self.lexer.add("SEMICOLON", r"\;")
         self.lexer.add("COLON", r"\:")
 

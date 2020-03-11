@@ -1,7 +1,7 @@
 from lexer import Lexer
 from my_parser import Parser
 from codegen import CodeGen
-from visitor_ast import Sum
+from ast import *
 
 import os
 from pathlib import Path
@@ -11,9 +11,8 @@ import sys
 # def golf_mode():
 #     if len(sys.argv[1].read()) > 5000:
 #         print("File too long!")
-#         print("In Golf mode, files must not exceed 50000 characters!")
+#         print("In Golf mode, files must not exceed 5000 characters!")
 #         exit()
-
 
 # Finding the source file in the directory tree
 def find_file():
@@ -23,7 +22,7 @@ def find_file():
         if file.name == file_arg:
             # Change directory
             os.chdir(str(p))
-            # # Reading the source file
+            # Reading the source file
             with open(file_arg) as f:
                 return f.read()
 
@@ -50,19 +49,19 @@ printf = codegen.printf
 pg = Parser(module, builder, printf)
 pg.parse()
 parser = pg.get_parser()
-parser.parse(tokens)
+# parser.parse(tokens)
+# print(parser.parse(tokens))
 
 # Loop through the list of statements, and evaluate
 # each one.
 for stmt in parser.parse(tokens):
-    print(stmt)
-
-# print(parser.parse(tokens))
+    codegen.visit(stmt)
+#     print(type(stmt))
 
 # Save the IR representation into an LL file
-# codegen.create_ir()
-# os.chdir("..")
-# codegen.save_ir("output.ll")
+codegen.create_ir()
+os.chdir("..")
+codegen.save_ir("output.ll")
 
 # if sys.argv[2] == "--golf":
 #     golf_mode()

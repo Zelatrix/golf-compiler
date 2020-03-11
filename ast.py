@@ -1,39 +1,15 @@
 from llvmlite import ir
 
-# Integers
-class Integer:
+class Visitor():
+    def visit(self, visitor):
+        return visitor.accept(self)
+
+# The general number type
+class Number:
     def __init__(self, builder, module, value):
-        self.value = value
         self.builder = builder
         self.module = module
-
-    def __eq__(self, other):
-        if not isinstance(other, Integer):
-            return NotImplemented
-        else:
-            return self.value == other.value
-
-    def eval(self):
-        i = ir.Constant(ir.IntType(64), int(self.value))
-        return i
-
-# Floating point numbers
-class Float:
-    def __init__(self, builder, module, value):
         self.value = value
-        self.builder = builder
-        self.module = module
-
-    def __eq__(self, other):
-        if not isinstance(other, Float):
-            return NotImplemented
-        else:
-            return self.value == other.value
-
-    def eval(self):
-        i = ir.Constant(ir.FloatType(), float(self.value))
-        return i
-
 
 # The general binary operator type
 class BinaryOp:
@@ -43,162 +19,181 @@ class BinaryOp:
         self.left = left
         self.right = right
 
+class UnaryOp:
+    def __init__(self, builder, module, value):
+        self.builder = builder
+        self.module = module
+        self.value = value
+
+# Integers
+class Integer(Number):
+    def __eq__(self, other):
+        if not isinstance(other, Integer):
+            return NotImplemented
+        else:
+            return self.value == other.value
+
+    def accept(self, visitor):
+        return visitor.visit_int(self.value)
+
+# Floating point numbers
+class Float(Number):
+    def __eq__(self, other):
+        if not isinstance(other, Float):
+            return NotImplemented
+        else:
+            return self.value == other.value
+
+    def accept(self, visitor):
+        return visitor.visit_float(self.value)
 
 # Defining the addition operation
 class Sum(BinaryOp):
-    def eval(self):
-        if isinstance(self.left, Integer) and isinstance(self.right, Integer):
-            i = self.builder.add(self.left.eval(), self.right.eval())
-        # elif isinstance(self.left, Float) and isinstance(self.right, Float):
-        #     i = self.builder.fadd(self.left.eval(), self.right.eval())
-            return i
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_sum(left, right)
 
 
 # Defining the subtraction operation
 class Sub(BinaryOp):
-    def eval(self):
-        if isinstance(self.left, Integer) and isinstance(self.right, Integer):
-            i = self.builder.sub(self.left.eval(), self.right.eval())
-        # elif isinstance(self.left, Float) and isinstance(self.right, Float):
-        #     i = self.builder.fsub(self.left.eval(), self.right.eval())
-            return i
-
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_sub(left, right)
 
 # Defining the multiplication operation
 class Mult(BinaryOp):
-    def eval(self):
-        if isinstance(self.left, Integer) and isinstance(self.right, Integer):
-            i = self.builder.mul(self.left.eval(), self.right.eval())
-        # elif isinstance(self.left, Float) and isinstance(self.right, Float):
-        #     i = self.builder.fmul(self.left.eval(), self.right.eval())
-            return i
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_mult(left, right)
 
 # Defining the division operation
 class Div(BinaryOp):
-    def eval(self):
-        # if self.right is Integer(str(0)) or self.right is Float(str(0.0)):
-        #     raise ZeroDivisionError("You cannot divide by zero!")
-        # else:
-            i = self.builder.sdiv(self.left.eval(), self.right.eval())
-            return i
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_div(left, right)
 
 # Defining the modulo operation
 class Modulus(BinaryOp):
-    def eval(self):
-#         if self.right == Integer(str(0)) or self.right == Float(str(0.0)):
-#             raise ZeroDivisionError("You cannot take the remainder of a division by zero!")
-#         else:
-            i = self.builder.srem(self.left.eval(), self.right.eval())
-            return i
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_mod(left, right)
 
-class Boolean:
-    def __init__(self):
-        pass
+# For handling Boolean types
+# class Boolean:
+#     def __init__(self, value):
+#         self.value = bool(value)
+#
+#     def accept(self, visitor):
+#         return self
 
 # Equality
 class Equal(BinaryOp):
-    def eval(self):
-        if self.left == self.right:
-            return True
-        else:
-            return False
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_eq(left, right)
+
+class NotEqual(BinaryOp):
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_neq(left, right)
 
 # Less than
 class Less(BinaryOp):
-    def eval(self):
-        if self.left < self.right:
-            return True
-        else:
-            return False
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        print(self.left)
+        right = self.right.accept(visitor)
+        return visitor.visit_lt(left, right)
 
 # Less than or equal to
 class LessEqual(BinaryOp):
-    def eval(self):
-        if self.left <= self.right:
-            return True
-        else:
-            return False
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_lte(left, right)
 
 # Greater than
 class Greater(BinaryOp):
-    def eval(self):
-        if self.left > self.right:
-            return True
-        else:
-            return False
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_gt(left, right)
 
 # Greater than or equal to
 class GreaterEqual(BinaryOp):
-    def eval(self):
-        if self.left >= self.right:
-            return True
-        else:
-            return False
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_gte(left, right)
+
+# Boolean AND
+class And(BinaryOp):
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_and(left, right)
+
+# Boolean OR
+class Or(BinaryOp):
+    def accept(self, visitor):
+        left = self.left.accept(visitor)
+        right = self.right.accept(visitor)
+        return visitor.visit_or(left, right)
+
+# Boolean NOT
+class Not(UnaryOp):
+    def accept(self, visitor):
+        value = self.value.accept(visitor)
+        return visitor.visit_not(value)
+
+# Variables
+class VarDeclaration:
+    # def __init__(self, builder, module, name, value):
+    def __init__(self, builder, module, name, value):
+        self.builder = builder
+        self.module = module
+        self.name = name
+        self.value = value
+
+    def accept(self, visitor):
+        return visitor.visit_var_dec(self.name, self.value)
+
+class VarUsage:
+    def __init__(self, builder, module, name):
+        self.builder = builder
+        self.module = module
+        self.name = name
+
+    def accept(self, visitor):
+        # ident = self.ident.accept(visitor)
+        return visitor.visit_var_usage(self.name)
 
 # Strings
-class String:
-    def __init__(self, value):
-        self.value = value
-
-    def eval(self, module, builder):
-        return self.value
-
-class Char:
-    def __init__(self, value):
-        self.value = value
-
-    def eval(self):
-        return self.value
-
-class Variable:
-    def __init__(self, ident):
-        self.ident = ident
-
-    def eval(self):
-        pass
-
-# class Loop:
-#     def __init__(self):
-#         pass
-
-#     def eval(self):
-#         pass
-
-# class If:
-#     def __init__(self, printf, value):
-#         self.printf = printf
+# class String:
+#     def __init__(self, value):
 #         self.value = value
+#
+#     def eval(self, module, builder):
+#         return self.value
 
-
-# class Array:
-#     def __init__(self, printf, value):
-#         self.printf = printf
+# class Char:
+#     def __init__(self, value):
 #         self.value = value
-
+#
+#     def accept(self, visitor):
+#         return self.value
 
 # class Colon:
 #     def __init__(self, printf, value):
 #         self.printf = printf
 #         self.value = value
-
-
-# class Semicolon:
-#     def __init__(self, printf, value):
-#         self.printf = printf
-#         self.value = value
-
-
-class Sequence:
-    def __init__(self, builder, module, printf, first, next):
-        self.printf = printf
-        self.builder = builder
-        self.module = module
-        self.first = first
-        self.next = next
-
-    def eval(self):
-        self.first.eval()
-        self.next.eval()
 
 
 # Defining the print function
@@ -208,20 +203,7 @@ class Print:
         self.builder = builder
         self.module = module
         self.value = value
-        self.initialised = False
 
-    # Evaluating the print function in LLVM
-    def eval(self):
-        if (not(self.initialised)):
-            voidptr_ty = ir.IntType(64).as_pointer()
-            fmt = "%i \n\0"
-            c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)), bytearray(fmt.encode("utf8")))
-            global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
-            global_fmt.linkage = 'internal'
-            global_fmt.global_constant = True
-            global_fmt.initializer = c_fmt
-            self.fmt_arg = self.builder.bitcast(global_fmt, voidptr_ty)
-            self.initialised = True
-
-        value = self.value.eval()
-        self.builder.call(self.printf, [self.fmt_arg, value])
+    def accept(self, visitor):
+        value = self.value.accept(visitor)
+        return visitor.visit_print(value)
