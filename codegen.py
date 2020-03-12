@@ -35,7 +35,7 @@ class CodeGen(Visitor):
     def _create_entry_block_alloca(self, topBuilder):
          saved_block = topBuilder.block
          builder = ir.IRBuilder(topBuilder.function.entry_basic_block)
-         var_addr = builder.alloca(ir.IntType(64), size=None)
+         var_addr = builder.alloca(ir.DoubleType(), size=None)
          topBuilder.position_at_end(saved_block)
          return var_addr
 
@@ -49,14 +49,14 @@ class CodeGen(Visitor):
         return i
 
     def visit_float(self, value):
-        i = ir.Constant(ir.FloatType(), float(value))
+        i = ir.Constant(ir.DoubleType(), float(value))
         return i
 
     # Visitor for Sum
     def visit_sum(self, left, right):
-        l = self.builder.sitofp(left, ir.DoubleType())
-        r = self.builder.sitofp(right, ir.DoubleType())
-        return self.builder.fadd(l, r)
+        #l = self.builder.sitofp(left, ir.DoubleType())
+        #r = self.builder.sitofp(right, ir.DoubleType())
+        return self.builder.fadd(left, right)
 
     # Visitor for Sum
     def visit_sub(self, left, right):
@@ -162,7 +162,7 @@ class CodeGen(Visitor):
         var_addr = self._create_entry_block_alloca(self.builder)
         self.add_variable(var_addr, ident)
         value = self.visit(value)
-        value = self.builder.fptosi(value, ir.IntType(64))
+   #     value = self.builder.fptosi(value, ir.IntType(64))
         self.builder.store(value, var_addr)
         # print(self.symbol_table)
 
@@ -175,7 +175,7 @@ class CodeGen(Visitor):
     def visit_print(self, value):
         if not(self.print_initialised):
             voidptr_ty = ir.IntType(64).as_pointer()
-            fmt = "%f \n\0"
+            fmt = "%lf \n\0"
             c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)), bytearray(fmt.encode("utf8")))
             global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
             global_fmt.linkage = 'internal'
