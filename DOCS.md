@@ -23,11 +23,39 @@ The language can accept integer arguments to these operations, but the results o
 
 Boolean Operators
 ---
-Boolean operators in the Golf language include `>`, `<`, `>=`, `<=`, `==`, `/=`
+The GOLF language has Boolean operators that test for equality, as well as if `x` is less than, greater than, less than or equal to, or greater than or equal to `y`. The following table shows the operators, along with the corresponding syntax:
+
+| Operation                  | Symbol       | Syntax     |
+|----------------------------|--------------|------------|
+| Greater Than               |     `>`      |            |
+| Less Than                  |     `<`      |            |
+| Greater Than or Equal To   |     `>=`     |            |
+| Less Than or Equal To      |     `<=`     |            |
+| Equal To                   |     `==`     |            |
+| Not Equal To               |     `/=`     |            |
 
 Variables
 ---
-Variables are declared using the `var` keyword
+Variables in the GOLF language are declared using the `var` keyword. Identifiers, that is, the name of the variable, can be one or more characters in length, and they cannot start with a number or an undescore. In addition to these rules, it is not legal to use the name of a keyword as a variable name. The following are examples of legal identifiers in the GOLF language:
 
-Control Structures
+- `x`
+- `Score`
+- `letter_array`
+
+Examples of non-legal identifiers include the following: 
+
+- `_myscore` // Starts with an underscore
+- `0x23`     // Starts with a number
+- `if`       // `if` is a keyword
+
+An example of a legal program is the following: 
+
+    var x := 23;
+    var y := 19;
+    print (x + y);
+
+In the above example, values are assigned to the variables `x` and `y`, then the values are added together and the result is returned to the user.
+
+Control Flow
 ---
+
