@@ -46,8 +46,8 @@ class Lexer():
         self.lexer.add("ID", r"[A-Za-z_]([A-Za-z_0-9])*")
 
         # Types
-        self.lexer.add("INT", r"(?<!\.)\d+(?!\.)")
         self.lexer.add("FLOAT", r"\d+\.\d+")
+        self.lexer.add("INT", r"(?<!\.)\d+(?!\.)")
         self.lexer.add("STRING", r"\".+\"")
         self.lexer.add("CHAR", r"[A-Za-z]")
 
