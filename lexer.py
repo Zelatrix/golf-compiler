@@ -49,7 +49,6 @@ class Lexer():
         self.lexer.add("FLOAT", r"\d+\.\d+")
         self.lexer.add("INT", r"(?<!\.)\d+(?!\.)")
         self.lexer.add("STRING", r"\".+\"")
-        self.lexer.add("CHAR", r"[A-Za-z]")
 
         # Tokens to ignore
         self.lexer.ignore(r"\/\/.+")
@@ -59,12 +58,16 @@ class Lexer():
         self.lexer.add("ASSIGN", r"\:\=")
         self.lexer.add("DBL_QUOTE", r"\"")
         self.lexer.add("SINGLE_QUOTE", r"\'")
+        self.lexer.add("SEMICOLON", r"\;")
+        self.lexer.add("COLON", r"\:")
+
+        # Brackets
         self.lexer.add("LEFT_PAR", r"\(")
         self.lexer.add("RIGHT_PAR", r"\)")
         self.lexer.add("LEFT_BRACE", r"\[")
         self.lexer.add("RIGHT_BRACE", r"\]")
-        self.lexer.add("SEMICOLON", r"\;")
-        self.lexer.add("COLON", r"\:")
+        self.lexer.add("LEFT_CURLY", r"\{")
+        self.lexer.add("RIGHT_CURLY", r"\}")
 
     # Add the tokens to the lexer
     # Build the lexer

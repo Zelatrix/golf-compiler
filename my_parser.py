@@ -1,23 +1,24 @@
 from rply import ParserGenerator
-from ast import Integer, Float #, Char, String, Boolean
+
+from ast import Integer, Float, String # Boolean
 from ast import Sum, Sub, Mult, Div, Modulus
 from ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
 from ast import Print, VarDeclaration, VarUsage, And, Or, Not
+from ast import IfThen, IfElse
 
 import re
 
 class Parser():
     def __init__(self, module, builder, printf):
         # The tokens accepted by the lexer
-        types =         ["INT", "FLOAT"]
+        types =         ["INT", "FLOAT", "STRING"]
         bools =         ["AND", "OR", "NOT", "TRUE", "FALSE"]
         arithmetic =    ["PLUS", "MINUS", "STAR", "SLASH", "MOD"]
-        brackets =      ["LEFT_BRACE", "RIGHT_BRACE", "LEFT_PAR", "RIGHT_PAR"]
+        brackets =      ["LEFT_BRACE", "RIGHT_BRACE", "LEFT_PAR", "RIGHT_PAR", "LEFT_CURLY", "RIGHT_CURLY"]
         comparison =    ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
-        keywords =      ["PRINT", "ARRAY", "VAR"]
+        keywords =      ["PRINT", "ARRAY", "VAR", "IF", "THEN", "ELSE"]
         other =         ["SEMICOLON", "ASSIGN", "ID"]
-        unused =        ["FUNCTION", "FOR", "UNTIL", "WHILE", "IF", "THEN", "ELSE", "CHAR", "STRING"]
-        # "DBL_QUOTE", "SINGLE_QUOTE", "BOOL"
+        unused =        ["FUNCTION", "FOR", "UNTIL", "WHILE", "CHAR", "DBL_QUOTE", "SINGLE_QUOTE", "BOOL"]
 
         # Joining all the tokens together into a single list
         empty = []
@@ -62,15 +63,9 @@ class Parser():
         def print_statement(p):
             return Print(self.builder, self.module, self.printf, p[2])
 
-        # @self.pg.production('expr : ID')
-        # def ident(p):
-        #     return str(p[0])
-
         # Parsing variables and variable assignment
         @self.pg.production('statement : VAR ID ASSIGN expr')
         def var_decl(p):
-            # if p[2].gettokentype() == "ASSIGN":
-                # return VarDeclaration(self.builder, self.module, p[1], p[3])
                 return VarDeclaration(self.builder, self.module, p[1].getstr(), p[3])
 
         @self.pg.production('expr : ID')
@@ -87,13 +82,19 @@ class Parser():
                 return Float(self.builder, self.module, p[0].value)
 
         # Strings/Chars
-        # @self.pg.production('expr : STRING')
-        # @self.pg.production('expr : CHAR')
-        # def string_char(p):
-        #     if value.gettokentype() == "STRING":
-        #         return String(self.builder, self.module, p[0])
-        #     elif value.gettokentype() == "CHAR":
-        #         return Char(self.builder, self.module, p[0])
+        @self.pg.production('expr : STRING')
+        def string_expr(p):
+                return String(self.builder, self.module, p[0].value)
+
+        # If-then statements
+        @self.pg.production('statement : IF expr THEN LEFT_CURLY statement_list RIGHT_CURLY')
+        def if_then(p):
+            return IfThen(self.builder, self.module, p[1], p[4])
+
+        # If-then-else statements
+        @self.pg.production('statement : IF expr THEN LEFT_CURLY statement_list RIGHT_CURLY ELSE LEFT_CURLY statement_list RIGHT_CURLY')
+        def if_else(p):
+            return IfElse(self.builder, self.module, p[1], p[4], p[8])
 
         # Arithmetic
         @self.pg.production('expr : expr PLUS expr')

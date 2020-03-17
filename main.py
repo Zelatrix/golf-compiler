@@ -47,16 +47,14 @@ printf = codegen.printf
 
 # Create a parser object and parse the list of tokens created by the lexer.
 pg = Parser(module, builder, printf)
+# print(module)
 pg.parse()
 parser = pg.get_parser()
-# parser.parse(tokens)
-# print(parser.parse(tokens))
 
 # Loop through the list of statements, and evaluate
 # each one.
 for stmt in parser.parse(tokens):
-    codegen.visit(stmt)
-#     print(type(stmt))
+   codegen.visit(stmt)
 
 # Save the IR representation into an LL file
 codegen.create_ir()

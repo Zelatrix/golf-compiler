@@ -108,7 +108,6 @@ class NotEqual(BinaryOp):
 class Less(BinaryOp):
     def accept(self, visitor):
         left = self.left.accept(visitor)
-        print(self.left)
         right = self.right.accept(visitor)
         return visitor.visit_lt(left, right)
 
@@ -176,25 +175,36 @@ class VarUsage:
         return visitor.visit_var_usage(self.name)
 
 # Strings
-# class String:
-#     def __init__(self, value):
-#         self.value = value
-#
-#     def eval(self, module, builder):
-#         return self.value
+class String:
+    def __init__(self, builder, module, value):
+        self.builder = builder
+        self.module = module
+        self.value = value
 
-# class Char:
-#     def __init__(self, value):
-#         self.value = value
-#
-#     def accept(self, visitor):
-#         return self.value
+    def accept(self, visitor):
+        return visitor.visit_string(self.value)
 
-# class Colon:
-#     def __init__(self, printf, value):
-#         self.printf = printf
-#         self.value = value
+#If-then statements
+class IfThen:
+    def __init__(self, builder, module, predicate, body):
+        self.builder = builder
+        self.module = module
+        self.predicate = predicate
+        self.body = body
 
+    def accept(self, visitor):
+        return visitor.visit_if(self.predicate, self.body)
+
+class IfElse:
+    def __init__(self, builder, module, predicate, if_body, else_body):
+        self.builder = builder
+        self.module = module
+        self.predicate = predicate
+        self.if_body = if_body
+        self.else_body = else_body
+
+    def accept(self, visitor):
+        return visitor.visit_if_else(self.predicate, self.if_body, self.else_body)
 
 # Defining the print function
 class Print:

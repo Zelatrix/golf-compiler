@@ -54,33 +54,23 @@ class CodeGen(Visitor):
 
     # Visitor for Sum
     def visit_sum(self, left, right):
-        #l = self.builder.sitofp(left, ir.DoubleType())
-        #r = self.builder.sitofp(right, ir.DoubleType())
         return self.builder.fadd(left, right)
 
     # Visitor for Sum
     def visit_sub(self, left, right):
-        l = self.builder.sitofp(left, ir.DoubleType())
-        r = self.builder.sitofp(right, ir.DoubleType())
-        return self.builder.fsub(l, r)
+        return self.builder.fsub(left, right)
 
     # Visitor for Mult
     def visit_mult(self, left, right):
-        l = self.builder.sitofp(left, ir.DoubleType())
-        r = self.builder.sitofp(right, ir.DoubleType())
-        return self.builder.fmul(l, r)
+        return self.builder.fmul(left, right)
 
     # Visitor for Div
     def visit_div(self, left, right):
-        l = self.builder.sitofp(left, ir.DoubleType())
-        r = self.builder.sitofp(right, ir.DoubleType())
-        return self.builder.fdiv(l, r)
+        return self.builder.fdiv(left, right)
 
     # Visitor for Modulus
     def visit_mod(self, left, right):
-        l = self.builder.sitofp(left, ir.DoubleType())
-        r = self.builder.sitofp(right, ir.DoubleType())
-        return self.builder.frem(l, r)
+        return self.builder.frem(left, right)
 
     # Visitor for Equal
     def visit_eq(self, left, right):
@@ -144,17 +134,13 @@ class CodeGen(Visitor):
         res = self.builder.not_(v)
         return self.builder.uitofp(res, ir.DoubleType())
 
-    #     class Test:
-    #     def __init__(self):
-    #         self.symbol_tab = {}
-    #
-    #     def add_var(self, name, value):
-    #         self.symbol_tab[name] = value
-    #
-    #     t = Test()
-    #     print(t.symbol_tab)
-    #     t.add_var("x", 23)
-    #     print(t.symbol_tab)
+    # Visitor for strings
+    def visit_string(self, value):
+        # pass
+        value = self.builder.gep(value)
+        return value
+        # self.builder.call()
+        # self.builder.ret()
 
     # Visitor for variables
     # def visit_var_dec(self, ident, value):
@@ -162,7 +148,7 @@ class CodeGen(Visitor):
         var_addr = self._create_entry_block_alloca(self.builder)
         self.add_variable(var_addr, ident)
         value = self.visit(value)
-   #     value = self.builder.fptosi(value, ir.IntType(64))
+        # value = self.builder.fptosi(value, ir.IntType(64))
         self.builder.store(value, var_addr)
         # print(self.symbol_table)
 
@@ -181,11 +167,33 @@ class CodeGen(Visitor):
             global_fmt.linkage = 'internal'
             global_fmt.global_constant = True
             global_fmt.initializer = c_fmt
-            self.fmt_arg = self.builder.bitcast(global_fmt, voidptr_ty)
+            builder = ir.IRBuilder()
+            builder.position_at_start(self.builder.function.entry_basic_block)
+            self.fmt_arg = builder.bitcast(global_fmt, voidptr_ty)
             self.print_initialised = True
         self.builder.call(self.printf, [self.fmt_arg, value])
 
-# Declare the function that is used for printing text to the console.
+    # Visitor for if-then statements
+    def visit_if(self, pred, body):
+        p = self.visit(pred)
+        bool_cond = self.builder.fptosi(p, ir.IntType(1))
+        with self.builder.if_then(bool_cond):
+            for stmt in body:
+                self.visit(stmt)
+
+    # Visitor for if-else statements
+    def visit_if_else(self, pred, if_body, else_body):
+        p = self.visit(pred)
+        bool_cond = self.builder.fptosi(p, ir.IntType(1))
+        with self.builder.if_else(bool_cond) as (then, otherwise):
+            with then:
+                for stmt in if_body:
+                    self.visit(stmt)
+            with otherwise:
+                for stmt in else_body:
+                    self.visit(stmt)
+
+    # Declare the function that is used for printing text to the console.
     def _declare_print_function(self):
         voidptr_ty = ir.IntType(64).as_pointer()
         printf_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
@@ -195,6 +203,7 @@ class CodeGen(Visitor):
     def _compile_ir(self):
         self.builder.ret_void()
         llvm_ir = str(self.module)
+        # print(llvm_ir)
         mod = self.binding.parse_assembly(llvm_ir)
         mod.verify()
         self.engine.add_module(mod)
@@ -202,8 +211,8 @@ class CodeGen(Visitor):
         self.engine.run_static_constructors()
         return mod
 
-# Create and save the .ll file that contains the intermediate
-# representation for the compiled program
+    # Create and save the .ll file that contains the intermediate
+    # representation for the compiled program
     def create_ir(self):
         self._compile_ir()
 
