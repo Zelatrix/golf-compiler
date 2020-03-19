@@ -22,6 +22,7 @@ class CodeGen(Visitor):
         base_func = ir.Function(self.module, func_type, name="main")
         block = base_func.append_basic_block(name="entry")
         self.builder = ir.IRBuilder(block)
+        self.builder.fadd(ir.Constant(ir.DoubleType(), 0), ir.Constant(ir.DoubleType(), 0))
 
     def _create_execution_engine(self):
         target = self.binding.Target.from_default_triple()
