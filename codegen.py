@@ -1,4 +1,4 @@
-from llvmlite import ir, binding
+ from llvmlite import ir, binding
 from ast import Visitor
 
 class CodeGen(Visitor):
@@ -14,6 +14,19 @@ class CodeGen(Visitor):
         self.print_initialised = False
         self.symbol_table = {}
 
+        voidptr_ty = ir.IntType(64).as_pointer()
+        fmt = "%lf \n\0"
+        c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)), bytearray(fmt.encode("utf8")))
+        global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
+        global_fmt.linkage = 'internal'
+        global_fmt.global_constant = True
+        global_fmt.initializer = c_fmt
+        # builder = ir.IRBuilder()
+        # builder.position_at_start(self.builder.function.entry_basic_block)
+        self.fmt_arg = self.builder.bitcast(global_fmt, voidptr_ty)
+        self.print_initialised = True
+
+
 # Configure LLVM with the required parameters.
     def _config_llvm(self):
         self.module = ir.Module(name=__file__)
@@ -22,7 +35,6 @@ class CodeGen(Visitor):
         base_func = ir.Function(self.module, func_type, name="main")
         block = base_func.append_basic_block(name="entry")
         self.builder = ir.IRBuilder(block)
-        self.builder.fadd(ir.Constant(ir.DoubleType(), 0), ir.Constant(ir.DoubleType(), 0))
 
     def _create_execution_engine(self):
         target = self.binding.Target.from_default_triple()
@@ -160,18 +172,7 @@ class CodeGen(Visitor):
 
     # Visitor for Print
     def visit_print(self, value):
-        if not(self.print_initialised):
-            voidptr_ty = ir.IntType(64).as_pointer()
-            fmt = "%lf \n\0"
-            c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)), bytearray(fmt.encode("utf8")))
-            global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
-            global_fmt.linkage = 'internal'
-            global_fmt.global_constant = True
-            global_fmt.initializer = c_fmt
-            builder = ir.IRBuilder()
-            builder.position_at_start(self.builder.function.entry_basic_block)
-            self.fmt_arg = builder.bitcast(global_fmt, voidptr_ty)
-            self.print_initialised = True
+        # if not(self.print_initialised):
         self.builder.call(self.printf, [self.fmt_arg, value])
 
     # Visitor for if-then statements
