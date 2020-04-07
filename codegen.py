@@ -1,4 +1,4 @@
- from llvmlite import ir, binding
+from llvmlite import ir, binding
 from ast import Visitor
 
 class CodeGen(Visitor):
@@ -84,6 +84,10 @@ class CodeGen(Visitor):
     # Visitor for Modulus
     def visit_mod(self, left, right):
         return self.builder.frem(left, right)
+    
+    # Visitor for unary negation
+    def visit_uneg(self, value):
+        return self.builder.fsub(ir.Constant(ir.DoubleType(), float(0)), value)
 
     # Visitor for Equal
     def visit_eq(self, left, right):
@@ -148,10 +152,10 @@ class CodeGen(Visitor):
         return self.builder.uitofp(res, ir.DoubleType())
 
     # Visitor for strings
-    def visit_string(self, value):
+    # def visit_string(self, value):
         # pass
-        value = self.builder.gep(value)
-        return value
+        # value = self.builder.gep(value)
+        # return value
         # self.builder.call()
         # self.builder.ret()
 

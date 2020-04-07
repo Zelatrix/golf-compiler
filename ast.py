@@ -74,7 +74,10 @@ class Div(BinaryOp):
     def accept(self, visitor):
         left = self.left.accept(visitor)
         right = self.right.accept(visitor)
-        return visitor.visit_div(left, right)
+        if right is Integer(self.builder, self.module, str(0)) or right is Float(self.builder, self.module, str(0.0)):
+            return ZeroDivisionError("Stop trying to break mathematics!")
+        else:
+            return visitor.visit_div(left, right)
 
 # Defining the modulo operation
 class Modulus(BinaryOp):
@@ -82,6 +85,13 @@ class Modulus(BinaryOp):
         left = self.left.accept(visitor)
         right = self.right.accept(visitor)
         return visitor.visit_mod(left, right)
+
+
+# Unary negation
+class UNeg(UnaryOp):
+    def accept(self, visitor):
+        value = self.value.accept(visitor)
+        return visitor.visit_uneg(value)
 
 # For handling Boolean types
 # class Boolean:

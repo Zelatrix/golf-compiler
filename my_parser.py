@@ -5,6 +5,7 @@ from ast import Sum, Sub, Mult, Div, Modulus
 from ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
 from ast import Print, VarDeclaration, VarUsage, And, Or, Not
 from ast import IfThen, IfElse
+from ast import UNeg
 
 import re
 
@@ -113,6 +114,15 @@ class Parser():
                 return Div(self.builder, self.module, p[0], p[2])
             elif p[1].gettokentype() == 'MOD':
                 return Modulus(self.builder, self.module, p[0], p[2])
+        
+        # Unary negation
+        @self.pg.production('expr : MINUS expr')
+        def uneg_single(p):
+            return UNeg(self.builder, self.module, p[1])
+        
+        @self.pg.production('expr : MINUS LEFT_PAR expr RIGHT_PAR')
+        def uneg_expr(p):
+            return UNeg(self.builder, self.module, p[2])
 
         # Boolean And and Or
         @self.pg.production('expr : expr AND expr')
