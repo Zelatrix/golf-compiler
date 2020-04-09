@@ -64,7 +64,7 @@ Control flow in GOLF has two main forms; if-then statements, and if-then-else st
         expr
     };
     
-Because they are statements, the block ends with a semicolon. This is different to a language like Java, which has if-then statements which do not end in a semcolon. The second type of conditional statement in GOLF is the if-then-else statement, which extends the standard if-then statement as in other languages to allow for multiple Boolean conditions to be checked. The sybtax fir this second for of conditional statement is the following: 
+Because they are statements, the block ends with a semicolon. This is different to a language like Java, which has if-then statements which do not end in a semcolon. The second type of conditional statement in GOLF is the if-then-else statement, which extends the standard if-then statement as in other languages to allow for multiple Boolean conditions to be checked. The syntax for this second for of conditional statement is the following: 
 
     if expr then {
         expr
