@@ -18,7 +18,7 @@ This version of the compiler also adds support for variables. It uses the LLVMli
 
 Version 0.0.3
 ---
-Version 0.0.3 of the compiler adds types for strings and characters, so that the functionality can be extended beyond basic arithmetical expressions. With this new addition to the compiler, it is now possible to write a "Hello, World" program that is reminiscent of the corresponding program in Python. Version 0.0.3 also adds `if-then` and `if-then-else` blocks to the language, allowing the programmer to perform operations based on Boolean conditions.
+Version 0.0.3 of the compiler adds types for strings and characters, so that the functionality can be extended beyond basic arithmetical expressions. Version 0.0.3 also adds `if-then` and `if-then-else` blocks to the language, allowing the programmer to perform operations based on Boolean conditions.
 
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
