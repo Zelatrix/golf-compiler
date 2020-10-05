@@ -53,13 +53,13 @@ parser = pg.get_parser()
 
 # Loop through the list of statements, and evaluate
 # each one.
-for stmt in parser.parse(tokens):
-   codegen.visit(stmt)
+# for stmt in parser.parse(tokens):
+#    codegen.visit(stmt)
 
 # Save the IR representation into an LL file
-codegen.create_ir()
-os.chdir("..")
-codegen.save_ir("output.ll")
+# codegen.create_ir()
+# os.chdir("..")
+# codegen.save_ir("output.ll")
 
 # if sys.argv[2] == "--golf":
 #     golf_mode()

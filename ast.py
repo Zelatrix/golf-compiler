@@ -216,6 +216,15 @@ class IfElse:
     def accept(self, visitor):
         return visitor.visit_if_else(self.predicate, self.if_body, self.else_body)
 
+# User defined functions
+class UserDefinedFunction:
+    def __init__(self, builder, module): 
+        self.builder = builder
+        self.module = module
+    
+    def accept(self, visitor):
+        visitor.visit_udf()
+
 # Defining the print function
 class Print:
     def __init__(self, builder, module, printf, value):

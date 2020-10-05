@@ -48,7 +48,7 @@ class Lexer():
         # Types
         self.lexer.add("FLOAT", r"\d+\.\d+")
         self.lexer.add("INT", r"(?<!\.)\d+(?!\.)")
-        self.lexer.add("STRING", r"\".+\"")
+        self.lexer.add("STRING", r"\".*\"")
 
         # Tokens to ignore
         self.lexer.ignore(r"\/\/.+")

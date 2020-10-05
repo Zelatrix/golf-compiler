@@ -152,22 +152,27 @@ class CodeGen(Visitor):
         return self.builder.uitofp(res, ir.DoubleType())
 
     # Visitor for strings
-    # def visit_string(self, value):
-        # pass
-        # value = self.builder.gep(value)
-        # return value
-        # self.builder.call()
-        # self.builder.ret()
+    def visit_string(self, value):
+        printf = ir.Function(self.module, )
+
+        string_addr = self._create_entry_block_alloca(self.builder)
+        indices = ir.Constant(ir.ArrayType(ir.IntType(8), 8), 8) # unsure about this line
+        value = self.builder.gep(string_addr, indices)
+        self.builder.call(printf, value) # unsure about this line
+        self.builder.ret(ir.Constant(ir.IntType(32), 0))
+        return value
+
+
+    # Visitor for UDFs
+    def visit_udf(self, name, args):
+        pass
 
     # Visitor for variables
-    # def visit_var_dec(self, ident, value):
     def visit_var_dec(self, ident, value):
         var_addr = self._create_entry_block_alloca(self.builder)
         self.add_variable(var_addr, ident)
         value = self.visit(value)
-        # value = self.builder.fptosi(value, ir.IntType(64))
         self.builder.store(value, var_addr)
-        # print(self.symbol_table)
 
     # Visitor for using variables
     def visit_var_usage(self, name):
@@ -209,7 +214,6 @@ class CodeGen(Visitor):
     def _compile_ir(self):
         self.builder.ret_void()
         llvm_ir = str(self.module)
-        # print(llvm_ir)
         mod = self.binding.parse_assembly(llvm_ir)
         mod.verify()
         self.engine.add_module(mod)

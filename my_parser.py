@@ -6,6 +6,7 @@ from ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
 from ast import Print, VarDeclaration, VarUsage, And, Or, Not
 from ast import IfThen, IfElse
 from ast import UNeg
+from ast import UserDefinedFunction
 
 import re
 
@@ -37,8 +38,6 @@ class Parser():
 
         #Rules of precedence for the operators
         precedence = [('left', ['PLUS', 'MINUS']), ('left', ['STAR', 'SLASH'])]
-                      # ('left', [])('left', [])
-                      # ('left', [])('left', [])
 
         self.pg = ParserGenerator(flatTokens, precedence)
         self.module = module
@@ -183,6 +182,11 @@ class Parser():
         @self.pg.error
         def error_handle(token):
             raise ValueError(token)
+        
+        # User defined functions
+        @self.pg.production('expr : FUNCTION expr LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
+        def udf(p):
+            return UserDefinedFunction(self.builder, self.module)
 
     def get_parser(self):
         return self.pg.build()
