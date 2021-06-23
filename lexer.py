@@ -1,15 +1,13 @@
 from rply import LexerGenerator
 
 
-class Lexer():
+class Lexer:
     def __init__(self):
         self.lexer = LexerGenerator()
 
     def add_tokens(self):
         # Keywords
         self.lexer.add("FUNCTION", r"function")
-        self.lexer.add("FOR", r"for")
-        self.lexer.add("UNTIL", r"until")
         self.lexer.add("WHILE", r"while")
         self.lexer.add("IF", r"if")
         self.lexer.add("THEN", r"then")
@@ -42,6 +40,9 @@ class Lexer():
         self.lexer.add("SLASH", r"\/")
         self.lexer.add("MOD", r"(mod)")
 
+        self.lexer.add("INC", r"\+\=")
+        self.lexer.add("DEC", r"\-\=")
+
         # Identifiers
         self.lexer.add("ID", r"[A-Za-z_]([A-Za-z_0-9])*")
 
@@ -49,6 +50,7 @@ class Lexer():
         self.lexer.add("FLOAT", r"\d+\.\d+")
         self.lexer.add("INT", r"(?<!\.)\d+(?!\.)")
         self.lexer.add("STRING", r"\".*\"")
+        self.lexer.add("CHAR", r"\'.\'")
 
         # Tokens to ignore
         self.lexer.ignore(r"\/\/.+")

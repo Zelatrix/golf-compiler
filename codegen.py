@@ -1,8 +1,9 @@
 from llvmlite import ir, binding
-from ast import Visitor
+from my_ast import Visitor
 
-class CodeGen(Visitor):
+
 # Initialise all the necessary variables that are used by LLVM
+class CodeGen(Visitor):
     def __init__(self):
         self.binding = binding
         self.binding.initialize()
@@ -26,8 +27,7 @@ class CodeGen(Visitor):
         self.fmt_arg = self.builder.bitcast(global_fmt, voidptr_ty)
         self.print_initialised = True
 
-
-# Configure LLVM with the required parameters.
+    # Configure LLVM with the required parameters.
     def _config_llvm(self):
         self.module = ir.Module(name=__file__)
         self.module.triple = self.binding.get_default_triple()
@@ -46,11 +46,11 @@ class CodeGen(Visitor):
     # Creates a basic block. This is the smallest element of a segment
     # of code, which has no branches leaving it.
     def _create_entry_block_alloca(self, topBuilder):
-         saved_block = topBuilder.block
-         builder = ir.IRBuilder(topBuilder.function.entry_basic_block)
-         var_addr = builder.alloca(ir.DoubleType(), size=None)
-         topBuilder.position_at_end(saved_block)
-         return var_addr
+        saved_block = topBuilder.block
+        builder = ir.IRBuilder(topBuilder.function.entry_basic_block)
+        var_addr = builder.alloca(ir.DoubleType(), size=None)
+        topBuilder.position_at_end(saved_block)
+        return var_addr
 
     def add_variable(self, var_addr, var_name):
         self.symbol_table[var_name] = var_addr
@@ -58,12 +58,10 @@ class CodeGen(Visitor):
 
     # Visitor for integers
     def visit_int(self, value):
-        i = ir.Constant(ir.DoubleType(), float(value))
-        return i
+        return ir.Constant(ir.DoubleType(), float(value))
 
     def visit_float(self, value):
-        i = ir.Constant(ir.DoubleType(), float(value))
-        return i
+        return ir.Constant(ir.DoubleType(), float(value))
 
     # Visitor for Sum
     def visit_sum(self, left, right):
@@ -152,20 +150,23 @@ class CodeGen(Visitor):
         return self.builder.uitofp(res, ir.DoubleType())
 
     # Visitor for strings
-    def visit_string(self, value):
-        printf = ir.Function(self.module, )
+    # def visit_string(self, value):
+    #     printf = ir.Function(self.module, )
+    #
+    #     string_addr = self._create_entry_block_alloca(self.builder)
+    #     indices = ir.Constant(ir.ArrayType(ir.IntType(8), 8), 8) # unsure about this line
+    #     value = self.builder.gep(string_addr, indices)
+    #     self.builder.call(printf, value) # unsure about this line
+    #     self.builder.ret(ir.Constant(ir.IntType(32), 0))
+    #     return value
 
-        string_addr = self._create_entry_block_alloca(self.builder)
-        indices = ir.Constant(ir.ArrayType(ir.IntType(8), 8), 8) # unsure about this line
-        value = self.builder.gep(string_addr, indices)
-        self.builder.call(printf, value) # unsure about this line
-        self.builder.ret(ir.Constant(ir.IntType(32), 0))
-        return value
-
+    # Visitor for characters
+    # def visit_char(self, value):
+    #     pass
 
     # Visitor for UDFs
-    def visit_udf(self, name, args):
-        pass
+    # def visit_udf(self, name, args):
+    #     pass
 
     # Visitor for variables
     def visit_var_dec(self, ident, value):
@@ -203,6 +204,24 @@ class CodeGen(Visitor):
             with otherwise:
                 for stmt in else_body:
                     self.visit(stmt)
+
+    # Visitor for while loops
+    # def visit_while(self, pred):
+    #     p = self.visit(pred)
+    #     bool_cond = self.builder.fptosi(p, ir.IntType(1))
+    #     with self.builder.while_loop(bool_cond) as body:
+    #         for stmt in body:
+    #             self.visit(stmt)
+
+    # def visit_increment(self, variable, value):
+    #     var = self.visit(variable)
+    #     val = self.visit(value)
+    #     var += val
+
+    # def visit_decrement(self, variable, value):
+    #     var = self.visit(variable)
+    #     val = self.visit(value)
+    #     var -= val
 
     # Declare the function that is used for printing text to the console.
     def _declare_print_function(self):

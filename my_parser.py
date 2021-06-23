@@ -1,45 +1,37 @@
 from rply import ParserGenerator
 
-from ast import Integer, Float, String # Boolean
-from ast import Sum, Sub, Mult, Div, Modulus
-from ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
-from ast import Print, VarDeclaration, VarUsage, And, Or, Not
-from ast import IfThen, IfElse
-from ast import UNeg
-from ast import UserDefinedFunction
+from my_ast import Integer, Float  # , String, Char, Boolean
+from my_ast import Sum, Sub, Mult, Div, Modulus
+from my_ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
+from my_ast import Print, VarDeclaration, VarUsage, And, Or, Not
+from my_ast import IfThen, IfElse
+from my_ast import UNeg
+# from my_ast import While UserDefinedFunction
 
-import re
 
-class Parser():
+class Parser:
     def __init__(self, module, builder, printf):
         # The tokens accepted by the lexer
-        types =         ["INT", "FLOAT", "STRING"]
-        bools =         ["AND", "OR", "NOT", "TRUE", "FALSE"]
-        arithmetic =    ["PLUS", "MINUS", "STAR", "SLASH", "MOD"]
-        brackets =      ["LEFT_BRACE", "RIGHT_BRACE", "LEFT_PAR", "RIGHT_PAR", "LEFT_CURLY", "RIGHT_CURLY"]
-        comparison =    ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
-        keywords =      ["PRINT", "ARRAY", "VAR", "IF", "THEN", "ELSE"]
-        other =         ["SEMICOLON", "ASSIGN", "ID"]
-        unused =        ["FUNCTION", "FOR", "UNTIL", "WHILE", "CHAR", "DBL_QUOTE", "SINGLE_QUOTE", "BOOL"]
+        types = ["INT", "FLOAT"]  # , "STRING", "CHAR"]
+        booleans = ["AND", "OR", "NOT", "TRUE", "FALSE"]
+        arithmetic = ["PLUS", "MINUS", "STAR", "SLASH", "MOD"]
+        brackets = ["LEFT_PAR", "RIGHT_PAR", "LEFT_CURLY", "RIGHT_CURLY"]
+        comparison = ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
+        keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE"]
+        other = ["SEMICOLON", "ASSIGN", "ID"]  # , "INC", "DEC"]
+        # unused = ["FUNCTION", "DBL_QUOTE", "SINGLE_QUOTE", "BOOL", "LEFT_BRACE", "RIGHT_BRACE", "WHILE", "ARRAY"]
 
         # Joining all the tokens together into a single list
-        empty = []
-        empty.append(types)
-        empty.append(bools)
-        empty.append(arithmetic)
-        empty.append(comparison)
-        empty.append(brackets)
-        empty.append(keywords)
-        empty.append(other)
-        tokenList = empty
+        empty = [types, booleans, arithmetic, comparison, brackets, keywords, other]
+        token_list = empty
 
         # Flatten the nested list of tokens
-        flatTokens = [val for sublist in tokenList for val in sublist]
+        flat_tokens = [val for sublist in token_list for val in sublist]
 
-        #Rules of precedence for the operators
+        # Rules of precedence for the operators
         precedence = [('left', ['PLUS', 'MINUS']), ('left', ['STAR', 'SLASH'])]
 
-        self.pg = ParserGenerator(flatTokens, precedence)
+        self.pg = ParserGenerator(flat_tokens, precedence)
         self.module = module
         self.builder = builder
         self.printf = printf
@@ -59,14 +51,13 @@ class Parser():
             return []
 
         @self.pg.production('statement : PRINT LEFT_PAR expr RIGHT_PAR')
-        # @self.pg.production('statement : PRINT LEFT_PAR IDENTIFIER RIGHT_PAR')
         def print_statement(p):
             return Print(self.builder, self.module, self.printf, p[2])
 
         # Parsing variables and variable assignment
         @self.pg.production('statement : VAR ID ASSIGN expr')
         def var_decl(p):
-                return VarDeclaration(self.builder, self.module, p[1].getstr(), p[3])
+            return VarDeclaration(self.builder, self.module, p[1].getstr(), p[3])
 
         @self.pg.production('expr : ID')
         def var_use(p):
@@ -82,9 +73,13 @@ class Parser():
                 return Float(self.builder, self.module, p[0].value)
 
         # Strings/Chars
-        @self.pg.production('expr : STRING')
-        def string_expr(p):
-                return String(self.builder, self.module, p[0].value)
+        # @self.pg.production('expr : STRING')
+        # @self.pg.production('expr : CHAR')
+        # def string_char_expr(p):
+        #     if len(p[0]) == 1:
+        #         return Char(self.builder, self.module, p[0].value)
+        #     else:
+        #         return String(self.builder, self.module, p[0].value)
 
         # If-then statements
         @self.pg.production('statement : IF expr THEN LEFT_CURLY statement_list RIGHT_CURLY')
@@ -92,7 +87,8 @@ class Parser():
             return IfThen(self.builder, self.module, p[1], p[4])
 
         # If-then-else statements
-        @self.pg.production('statement : IF expr THEN LEFT_CURLY statement_list RIGHT_CURLY ELSE LEFT_CURLY statement_list RIGHT_CURLY')
+        @self.pg.production('statement : IF expr THEN LEFT_CURLY statement_list RIGHT_CURLY '
+                            'ELSE LEFT_CURLY statement_list RIGHT_CURLY')
         def if_else(p):
             return IfElse(self.builder, self.module, p[1], p[4], p[8])
 
@@ -142,7 +138,6 @@ class Parser():
         @self.pg.production('expr : FALSE')
         def bool_expr(p):
             if p[0].gettokentype() == "TRUE":
-                # print("returning 1")
                 return Integer(self.builder, self.module, 1)
             else:
                 return Integer(self.builder, self.module, 0)
@@ -173,10 +168,27 @@ class Parser():
             elif p[1].gettokentype() == 'NOT_EQUAL':
                 return NotEqual(self.builder, self.module, p[0], p[2])
 
+        # While loops
+        # @self.pg.production('expr : WHILE LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
+        # def while_loop(p):
+        #     return While(self.builder, self.module, p[2])
+
         # Arrays
-        @self.pg.production('expr : ARRAY LEFT_BRACE expr RIGHT_BRACE')
-        def array(p):
-            pass
+        # @self.pg.production('expr : ARRAY LEFT_BRACE expr RIGHT_BRACE')
+        # def array(p):
+        #     pass
+
+        # Increment a variable by a number
+        # @self.pg.production('expr : ID INC INT')
+        # @self.pg.production('expr : ID INC FLOAT')
+        # def increment(variable, value):
+        #     return Increment(self.builder, self.module)
+
+        # Decrement a variable by a number
+        # @self.pg.production('expr : ID DEC INT')
+        # @self.pg.production('expr : ID DEC FLOAT')
+        # def decrement(variable, value):
+        #     return Decrement(self.builder, self.module)
 
         # Error handling
         @self.pg.error
@@ -184,9 +196,9 @@ class Parser():
             raise ValueError(token)
         
         # User defined functions
-        @self.pg.production('expr : FUNCTION expr LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
-        def udf(p):
-            return UserDefinedFunction(self.builder, self.module)
+        # @self.pg.production('expr : FUNCTION expr LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
+        # def udf(p):
+        #     return UserDefinedFunction(self.builder, self.module)
 
     def get_parser(self):
         return self.pg.build()
