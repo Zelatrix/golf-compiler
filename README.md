@@ -20,6 +20,10 @@ Version 0.0.3
 ---
 Version 0.0.3 of the compiler adds types for strings and characters, so that the functionality can be extended beyond basic arithmetical expressions. Version 0.0.3 also adds `if-then` and `if-then-else` blocks to the language, allowing the programmer to perform operations based on Boolean conditions.
 
+Version 0.0.4
+---
+Version 0.0.4 introduces the capability to increment and decrement the value of variables using the `+=` and `-=` operators, as well as the `while` loop and the ability for users to write their own functions. 
+
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
 - https://tomassetti.me/ebnf/
