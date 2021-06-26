@@ -204,14 +204,15 @@ class VarUsage:
 
 
 # Strings
-# class String:
-#     def __init__(self, builder, module, value):
-#         self.builder = builder
-#         self.module = module
-#         self.value = value
-#
-#     def accept(self, visitor):
-#         return visitor.visit_string(self.value)
+class String:
+    def __init__(self, builder, module, value):
+        self.builder = builder
+        self.module = module
+        self.value = value
+        self.length = len(value)
+
+    def accept(self, visitor):
+        return visitor.visit_string(self.value, self.length)
 
 
 # Characters
@@ -267,13 +268,15 @@ class IfElse:
 #         visitor.visit_while(self.predicate)
 
 # Increment a variable
-# class Increment:
-#     def __init__(self, var, value):
-#         self.var = var
-#         self.value = value
-#
-#     def accept(self, visitor):
-#         visitor.visit_increment(self.var, self.value)
+class Increment:
+    def __init__(self, builder, module, variable, value):
+        self.builder = builder
+        self.module = module
+        self.variable = variable
+        self.value = value
+
+    def accept(self, visitor):
+        visitor.visit_increment(self.variable, self.value)
 
 
 # Decrement a variable

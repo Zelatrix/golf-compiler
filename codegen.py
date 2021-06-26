@@ -150,15 +150,43 @@ class CodeGen(Visitor):
         return self.builder.uitofp(res, ir.DoubleType())
 
     # Visitor for strings
-    # def visit_string(self, value):
-    #     printf = ir.Function(self.module, )
-    #
-    #     string_addr = self._create_entry_block_alloca(self.builder)
-    #     indices = ir.Constant(ir.ArrayType(ir.IntType(8), 8), 8) # unsure about this line
-    #     value = self.builder.gep(string_addr, indices)
-    #     self.builder.call(printf, value) # unsure about this line
-    #     self.builder.ret(ir.Constant(ir.IntType(32), 0))
-    #     return value
+    def visit_string(self, value, length):
+        """
+        Helpful constants
+        """
+        tmp2_args = None
+        str_len = ir.ArrayType(ir.IntType(8), length)  # An array of 8-bit integers the length of the string
+        i32 = ir.IntType(32)  # An alias for 32-bit integers
+        binding.ValueRef.linkage = "internal"  # Setting the linkage type to internal
+        str_const = ir.Constant(ir.ArrayType(ir.IntType(8), length), value)  # Internal string constant
+
+        """
+        Defining the printf function
+        """
+
+        # If var_arg = True, then the function takes a variable number of arguments
+        printf_ty = ir.FunctionType(i32, [ir.IntType(8).as_pointer()], var_arg=True)
+        string_printf = ir.Function(self.module, printf_ty, name="str_printf").is_declaration
+
+        # Setting is_declaration = True tells LLVM that it is a declaration
+        # and not a definition of a complete function; just the header.
+        # string_printf.is_declaration
+
+        """
+        Defining the main function
+        """
+        fnty = ir.FunctionType(i32, [ir.IntType(8).as_pointer()])  # The type of the function
+        func = ir.Function(self.module, fnty, name="str_main")
+        # argc, argv = func.args
+
+        """
+        The function implementation
+        """
+        block = func.append_basic_block(name="entry")
+        builder = ir.IRBuilder(block)
+        builder.gep(str_len, str_len.as_pointer(), str_const, name="tmp1")
+        builder.call(string_printf, tmp2_args, name="tmp2")
+        builder.ret(ir.Constant(ir.IntType(32), 0))
 
     # Visitor for characters
     # def visit_char(self, value):
@@ -213,12 +241,20 @@ class CodeGen(Visitor):
     #         for stmt in body:
     #             self.visit(stmt)
 
-    # def visit_increment(self, variable, value):
-    #     var = self.visit(variable)
-    #     val = self.visit(value)
-    #     var += val
+    # There is a bug here, which causes the value to be loaded into memory twice
+    # I suspect it's because var_usage also loads it into memory, and incrementing
+    # the variable's value gets parsed as a variable usage.
 
-    # def visit_decrement(self, variable, value):
+    # The issue is that it needs to be loaded into memory inside visit_increment
+    # so that it can be used inside the `fadd` instruction.
+    def visit_increment(self, variable, val):
+        dbl_val = ir.Constant(ir.DoubleType(), val)        # Convert the number to be added into an LLVM object
+        var_addr = self.symbol_table[variable]             # Get the value and load it into memory
+        load_instr = self.builder.load(var_addr)
+        return self.builder.fadd(load_instr, dbl_val)      # Increment the variable's value by the specified amount
+
+    def visit_decrement(self, variable, value):
+        pass
     #     var = self.visit(variable)
     #     val = self.visit(value)
     #     var -= val

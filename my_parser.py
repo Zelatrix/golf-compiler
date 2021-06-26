@@ -1,24 +1,25 @@
 from rply import ParserGenerator
 
-from my_ast import Integer, Float  # , String, Char, Boolean
+from my_ast import Integer, Float, String  # , Boolean
 from my_ast import Sum, Sub, Mult, Div, Modulus
 from my_ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
 from my_ast import Print, VarDeclaration, VarUsage, And, Or, Not
 from my_ast import IfThen, IfElse
 from my_ast import UNeg
+from my_ast import Increment
 # from my_ast import While UserDefinedFunction
 
 
 class Parser:
     def __init__(self, module, builder, printf):
         # The tokens accepted by the lexer
-        types = ["INT", "FLOAT"]  # , "STRING", "CHAR"]
+        types = ["INT", "FLOAT", "STRING"]  # , "CHAR"]
         booleans = ["AND", "OR", "NOT", "TRUE", "FALSE"]
         arithmetic = ["PLUS", "MINUS", "STAR", "SLASH", "MOD"]
         brackets = ["LEFT_PAR", "RIGHT_PAR", "LEFT_CURLY", "RIGHT_CURLY"]
         comparison = ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
         keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE"]
-        other = ["SEMICOLON", "ASSIGN", "ID"]  # , "INC", "DEC"]
+        other = ["SEMICOLON", "ASSIGN", "ID", "INC"]  # , "DEC"]
         # unused = ["FUNCTION", "DBL_QUOTE", "SINGLE_QUOTE", "BOOL", "LEFT_BRACE", "RIGHT_BRACE", "WHILE", "ARRAY"]
 
         # Joining all the tokens together into a single list
@@ -59,6 +60,11 @@ class Parser:
         def var_decl(p):
             return VarDeclaration(self.builder, self.module, p[1].getstr(), p[3])
 
+        # Increment a variable by a number
+        @self.pg.production('statement : ID INC INT')
+        def increment(p):
+            return Increment(self.builder, self.module, p[0].getstr(), p[2].getstr())
+
         @self.pg.production('expr : ID')
         def var_use(p):
             return VarUsage(self.builder, self.module, p[0].getstr())
@@ -73,13 +79,13 @@ class Parser:
                 return Float(self.builder, self.module, p[0].value)
 
         # Strings/Chars
-        # @self.pg.production('expr : STRING')
+        @self.pg.production('expr : STRING')
         # @self.pg.production('expr : CHAR')
-        # def string_char_expr(p):
-        #     if len(p[0]) == 1:
-        #         return Char(self.builder, self.module, p[0].value)
-        #     else:
-        #         return String(self.builder, self.module, p[0].value)
+        def string_expr(p):
+            # if len(p[0]) == 1:
+            #     return Char(self.builder, self.module, p[0].value)
+            # else:
+            return String(self.builder, self.module, p[0].value)
 
         # If-then statements
         @self.pg.production('statement : IF expr THEN LEFT_CURLY statement_list RIGHT_CURLY')
@@ -177,12 +183,6 @@ class Parser:
         # @self.pg.production('expr : ARRAY LEFT_BRACE expr RIGHT_BRACE')
         # def array(p):
         #     pass
-
-        # Increment a variable by a number
-        # @self.pg.production('expr : ID INC INT')
-        # @self.pg.production('expr : ID INC FLOAT')
-        # def increment(variable, value):
-        #     return Increment(self.builder, self.module)
 
         # Decrement a variable by a number
         # @self.pg.production('expr : ID DEC INT')

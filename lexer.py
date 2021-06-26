@@ -33,15 +33,16 @@ class Lexer:
         self.lexer.add("GREATER_THAN", r"\>")
         self.lexer.add("NOT_EQUAL", r"\/\=")
 
+        # Increment and decrement
+        self.lexer.add("INC", r"\+\=")
+        self.lexer.add("DEC", r"\-\=")
+
         # Arithmetic
         self.lexer.add("PLUS", r"\+")
         self.lexer.add("MINUS", r"\-")
         self.lexer.add("STAR", r"\*")
         self.lexer.add("SLASH", r"\/")
         self.lexer.add("MOD", r"(mod)")
-
-        self.lexer.add("INC", r"\+\=")
-        self.lexer.add("DEC", r"\-\=")
 
         # Identifiers
         self.lexer.add("ID", r"[A-Za-z_]([A-Za-z_0-9])*")
