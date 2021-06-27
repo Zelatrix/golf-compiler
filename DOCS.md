@@ -27,12 +27,12 @@ The GOLF language has Boolean operators that test for equality, as well as if `x
 
 | Operation                  | Symbol       | Syntax     |
 |----------------------------|--------------|------------|
-| Greater Than               |     `>`      |            |
-| Less Than                  |     `<`      |            |
-| Greater Than or Equal To   |     `>=`     |            |
-| Less Than or Equal To      |     `<=`     |            |
-| Equal To                   |     `==`     |            |
-| Not Equal To               |     `/=`     |            |
+| Greater Than               |     `>`      |  5 > 3     |
+| Less Than                  |     `<`      |  4 < 10    |
+| Greater Than or Equal To   |     `>=`     |  x >= 10   |
+| Less Than or Equal To      |     `<=`     |  y <= 6    |
+| Equal To                   |     `==`     |  x == y    |
+| Not Equal To               |     `/=`     |  x /= y    |
 
 Variables
 ---
@@ -44,9 +44,11 @@ Variables in the GOLF language are declared using the `var` keyword. Identifiers
 
 Examples of non-legal identifiers include the following: 
 
-- `_myscore` // Starts with an underscore
-- `0x23`     // Starts with a number
-- `if`       // `if` is a keyword
+| Identifier | Reason                    |
+-----------------------------------------|
+| `_myscore` | Starts with an underscore |
+| `0x23`     | Starts with a number      |
+| `if`       | `if` is a keyword         |
 
 An example of a legal program is the following: 
 
