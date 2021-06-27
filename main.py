@@ -15,14 +15,15 @@ for arg in sys.argv:
 
 # Golf mode
 if "--golf" in args:
-    if len(sys.argv[1].read()) > 5000:
-        print("File too long!")
-        print("In Golf mode, files must not exceed 5000 characters!")
-        exit()
+    with open(sys.argv[1]) as source:
+        if len(source.read()) > 5000:
+            print("File too long!")
+            print("In Golf mode, files must not exceed 5000 characters!")
+            exit()
 
 # Shell mode
 if "--shell" in args:
-    pass
+    print("golf> ")
 
 """
 End of command line section

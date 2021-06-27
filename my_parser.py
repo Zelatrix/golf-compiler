@@ -3,10 +3,10 @@ from rply import ParserGenerator
 from my_ast import Integer, Float, String  # , Boolean
 from my_ast import Sum, Sub, Mult, Div, Modulus
 from my_ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
-from my_ast import Print, VarDeclaration, VarUsage, And, Or, Not
+from my_ast import Print, VarDeclaration, VarUsage, VarReassign, And, Or, Not
 from my_ast import IfThen, IfElse
 from my_ast import UNeg
-from my_ast import Increment
+from my_ast import Increment, Decrement
 # from my_ast import While UserDefinedFunction
 
 
@@ -19,7 +19,7 @@ class Parser:
         brackets = ["LEFT_PAR", "RIGHT_PAR", "LEFT_CURLY", "RIGHT_CURLY"]
         comparison = ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
         keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE"]
-        other = ["SEMICOLON", "ASSIGN", "ID", "INC"]  # , "DEC"]
+        other = ["SEMICOLON", "ASSIGN", "ID", "INC", "DEC"]
         # unused = ["FUNCTION", "DBL_QUOTE", "SINGLE_QUOTE", "BOOL", "LEFT_BRACE", "RIGHT_BRACE", "WHILE", "ARRAY"]
 
         # Joining all the tokens together into a single list
@@ -60,10 +60,19 @@ class Parser:
         def var_decl(p):
             return VarDeclaration(self.builder, self.module, p[1].getstr(), p[3])
 
+        @self.pg.production('statement : ID ASSIGN expr')
+        def var_reassign(p):
+            return VarReassign(self.builder, self.module, p[0].getstr(), p[2])
+
         # Increment a variable by a number
         @self.pg.production('statement : ID INC INT')
         def increment(p):
             return Increment(self.builder, self.module, p[0].getstr(), p[2].getstr())
+
+        @self.pg.production('statement : ID DEC INT')
+        def decrement(p):
+            return Decrement(self.builder, self.module, p[0].getstr(), p[2].getstr())
+
 
         @self.pg.production('expr : ID')
         def var_use(p):

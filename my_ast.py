@@ -192,6 +192,17 @@ class VarDeclaration:
         return visitor.visit_var_dec(self.name, self.value)
 
 
+# Variable reassignment
+class VarReassign:
+    def __init__(self, builder, module, name, value):
+        self.builder = builder
+        self.module = module
+        self.name = name
+        self.value = value
+
+    def accept(self, visitor):
+        return visitor.visit_reassign(self.name, self.value)
+
 class VarUsage:
     def __init__(self, builder, module, name):
         self.builder = builder
@@ -280,13 +291,15 @@ class Increment:
 
 
 # Decrement a variable
-# class Decrement:
-#     def __init__(self, var, value):
-#         self.var = var
-#         self.value = value
-#
-#     def accept(self, visitor):
-#         visitor.visit_decrement(self.var, self.value)
+class Decrement:
+    def __init__(self, builder, module, var, value):
+        self.builder = builder
+        self.module = module
+        self.var = var
+        self.value = value
+
+    def accept(self, visitor):
+        visitor.visit_decrement(self.var, self.value)
 
 
 # Defining the print function

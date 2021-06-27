@@ -48,12 +48,12 @@ class CodeGen(Visitor):
     def _create_entry_block_alloca(self, topBuilder):
         saved_block = topBuilder.block
         builder = ir.IRBuilder(topBuilder.function.entry_basic_block)
-        var_addr = builder.alloca(ir.DoubleType(), size=None)
+        var_address = builder.alloca(ir.DoubleType(), size=None)
         topBuilder.position_at_end(saved_block)
-        return var_addr
+        return var_address
 
-    def add_variable(self, var_addr, var_name):
-        self.symbol_table[var_name] = var_addr
+    def add_variable(self, var_address, var_name):
+        self.symbol_table[var_name] = var_address
         # print(self.symbol_table)
 
     # Visitor for integers
@@ -82,7 +82,7 @@ class CodeGen(Visitor):
     # Visitor for Modulus
     def visit_mod(self, left, right):
         return self.builder.frem(left, right)
-    
+
     # Visitor for unary negation
     def visit_uneg(self, value):
         return self.builder.fsub(ir.Constant(ir.DoubleType(), float(0)), value)
@@ -198,19 +198,51 @@ class CodeGen(Visitor):
 
     # Visitor for variables
     def visit_var_dec(self, ident, value):
-        var_addr = self._create_entry_block_alloca(self.builder)
-        self.add_variable(var_addr, ident)
+        var_address = self._create_entry_block_alloca(self.builder)
+        self.add_variable(var_address, ident)
         value = self.visit(value)
-        self.builder.store(value, var_addr)
+        self.builder.store(value, var_address)
 
     # Visitor for using variables
     def visit_var_usage(self, name):
-        var_addr = self.symbol_table[name]
-        return self.builder.load(var_addr)
+        var_address = self.symbol_table[name]
+        load_address = self.builder.load(var_address)
+        return load_address
+
+    # Visitor for variable reassignment
+    def visit_reassign(self, ident, value):
+        load_address = self.symbol_table[ident]
+        value = self.visit(value)
+        self.builder.store(value, load_address)
+
+    # ---- BUG SOLVED ----
+    # There is a bug here, which causes the value to be loaded into memory twice
+    # I suspect it's because var_usage also loads it into memory, and incrementing
+    # the variable's value gets parsed as a variable usage.
+
+    # The issue is that it needs to be loaded into memory inside visit_increment
+    # so that it can be used inside the `fadd` instruction.
+
+    # Solution: https://llvm.discourse.group/t/implementing-in-llvm-ir/3744
+
+    def visit_increment(self, variable, val):
+        dbl_val = ir.Constant(ir.DoubleType(), val)           # Convert the number to be added into an LLVM object
+        var_address = self.symbol_table[variable]             # Get the value and load it into memory
+        load_instr = self.builder.load(var_address)
+        incremented = self.builder.fadd(load_instr, dbl_val)  # Increment the variable's value by the specified amount
+        self.builder.store(incremented, var_address)          # Store the result back into memory to replace the old value
+        return incremented
+
+    def visit_decrement(self, variable, value):
+        dbl_val = ir.Constant(ir.DoubleType(), value)         # Convert the number to be added into an LLVM object
+        var_address = self.symbol_table[variable]             # Get the value and load it into memory
+        load_instr = self.builder.load(var_address)
+        decremented = self.builder.fsub(load_instr, dbl_val)  # Decrement the variable's value by the specified amount
+        self.builder.store(decremented, var_address)          # Store the result back into memory to replace the old value
+        return decremented
 
     # Visitor for Print
     def visit_print(self, value):
-        # if not(self.print_initialised):
         self.builder.call(self.printf, [self.fmt_arg, value])
 
     # Visitor for if-then statements
@@ -240,24 +272,6 @@ class CodeGen(Visitor):
     #     with self.builder.while_loop(bool_cond) as body:
     #         for stmt in body:
     #             self.visit(stmt)
-
-    # There is a bug here, which causes the value to be loaded into memory twice
-    # I suspect it's because var_usage also loads it into memory, and incrementing
-    # the variable's value gets parsed as a variable usage.
-
-    # The issue is that it needs to be loaded into memory inside visit_increment
-    # so that it can be used inside the `fadd` instruction.
-    def visit_increment(self, variable, val):
-        dbl_val = ir.Constant(ir.DoubleType(), val)        # Convert the number to be added into an LLVM object
-        var_addr = self.symbol_table[variable]             # Get the value and load it into memory
-        load_instr = self.builder.load(var_addr)
-        return self.builder.fadd(load_instr, dbl_val)      # Increment the variable's value by the specified amount
-
-    def visit_decrement(self, variable, value):
-        pass
-    #     var = self.visit(variable)
-    #     val = self.visit(value)
-    #     var -= val
 
     # Declare the function that is used for printing text to the console.
     def _declare_print_function(self):
