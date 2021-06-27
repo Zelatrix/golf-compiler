@@ -22,8 +22,9 @@ Version 0.0.3 of the compiler adds types for strings and characters, so that the
 
 Version 0.0.4
 ---
-Version 0.0.4 introduces the capability to increment and decrement the value of variables using the `+=` and `-=` operators, as well as the `while` loop and the ability for users to write their own functions. 
+Version 0.0.4 introduces the capability to increment and decrement the value of variables using the `+=` and `-=` operators, as well as the `while` loop and the ability for users to write their own functions. Functions in GOLF are defined using the `function` keyword, and the main body of the function is denoted using a pair of curly braces. 
 
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
 - https://tomassetti.me/ebnf/
+- https://llvm.discourse.group/t/implementing-in-llvm-ir/3744
