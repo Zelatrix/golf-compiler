@@ -5,6 +5,8 @@
 # Compiler
 This repository contains the source code for my compiler. I have also included source files for the language that is being compiled. The language I am compiling is of my own devising. This compiler was written for my BSc research project as part of my degree at the University of Kent. 
 
+NOTE: The file must be located in the same directory as the compiler's source files so it can find the file correctly. The structure is only to improve the organisation, and I am working on a way to dynamically provide an absolute file path!
+
 # Version History
 Version 0.0.1
 ---
