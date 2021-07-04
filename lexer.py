@@ -31,11 +31,13 @@ class Lexer:
         self.lexer.add("EQUAL", r"\=\=")
         self.lexer.add("LESS_THAN", r"\<")
         self.lexer.add("GREATER_THAN", r"\>")
-        self.lexer.add("NOT_EQUAL", r"\/\=")
+        self.lexer.add("NOT_EQUAL", r"\!\=")
 
         # Increment and decrement
         self.lexer.add("INC", r"\+\=")
         self.lexer.add("DEC", r"\-\=")
+        self.lexer.add("TIMESEQ", r"\*\=")
+        self.lexer.add("DIVEQ", r"\/\=")
 
         # Arithmetic
         self.lexer.add("PLUS", r"\+")
