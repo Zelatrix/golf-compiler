@@ -18,13 +18,13 @@ Version 0.0.2 introduces the capability to parse multiple statements from a file
 
 This version of the compiler also adds support for variables. It uses the LLVMlite library in Python to allocate the amount of space required on the stack for the type of variable in question, then it stores the specified value in that newly-allocated space on the stack. When the variable is required, the value is loaded into memory and returned. 
 
-Version 0.0.3
+Version 0.2.1
 ---
-Version 0.0.3 of the compiler adds types for strings and characters, so that the functionality can be extended beyond basic arithmetical expressions. Version 0.0.3 also adds `if-then` and `if-then-else` blocks to the language, allowing the programmer to perform operations based on Boolean conditions.
+Version 0.2.1 of the compiler adds types for strings and characters, so that the functionality can be extended beyond basic arithmetical expressions. Version 0.0.3 also adds `if-then` and `if-then-else` blocks to the language, allowing the programmer to perform operations based on Boolean conditions.
 
-Version 0.0.4
+Version 0.3.0
 ---
-Version 0.0.4 introduces the capability to increment and decrement the value of variables using the `+=` and `-=` operators, as well as the `while` loop and the ability for users to write their own functions. Functions in GOLF are defined using the `function` keyword, and the main body of the function is denoted using a pair of curly braces. 
+Version 0.3.0 introduces the capability to increment and decrement the value of variables using the `+=` and `-=` operators, as well as the `while` loop and the ability for users to write their own functions. Functions in GOLF are defined using the `function` keyword, and the main body of the function is denoted using a pair of curly braces. 
 
 Also in this iteration of the compiler, are two new operations to acompany the `+=` and `-=` operations, namely, the `*=` and `/=` operations to multiply or divide the value of a variable by a specified amount. This iteration also changes the syntax slightly for Boolean negation, as the operator was already in use. To avoid the clash, the Boolean negation operation has been changed to a more Java-like syntax as opposed to a Haskell-like syntax, and it can now be used with the `!=` operator, but it functions the same as before. 
 
