@@ -203,6 +203,7 @@ class VarReassign:
     def accept(self, visitor):
         return visitor.visit_reassign(self.name, self.value)
 
+
 class VarUsage:
     def __init__(self, builder, module, name):
         self.builder = builder
@@ -210,7 +211,6 @@ class VarUsage:
         self.name = name
 
     def accept(self, visitor):
-        # ident = self.ident.accept(visitor)
         return visitor.visit_var_usage(self.name)
 
 
@@ -260,23 +260,31 @@ class IfElse:
     def accept(self, visitor):
         return visitor.visit_if_else(self.predicate, self.if_body, self.else_body)
 
+
 # User defined functions
-# class UserDefinedFunction:
-#     def __init__(self, builder, module):
-#         self.builder = builder
-#         self.module = module
-#
-#     def accept(self, visitor):
-#         visitor.visit_udf()
+class UserDefinedFunction:
+    def __init__(self, builder, module, fn_name, fn_params, fn_body):
+        self.builder = builder
+        self.module = module
+        self.fn_name = fn_name
+        self.fn_body = fn_body
+        self.fn_params = fn_params
+
+    def accept(self, visitor):
+        visitor.visit_udf(self.fn_name, self.fn_params, self.fn_body)
 
 
 # While loops
-# class While:
-#     def __init__(self, builder, module, predicate):
-#         self.predicate = predicate
-#
-#     def accept(self, visitor):
-#         visitor.visit_while(self.predicate)
+class While:
+    def __init__(self, builder, module, predicate, body):
+        self.builder = builder
+        self.module = module
+        self.predicate = predicate
+        self.body = body
+
+    def accept(self, visitor):
+        visitor.visit_while(self.predicate, self.body)
+
 
 # Increment a variable
 class Increment:
@@ -302,6 +310,28 @@ class Decrement:
         visitor.visit_decrement(self.var, self.value)
 
 
+class TimesEq:
+    def __init__(self, builder, module, var, value):
+        self.builder = builder
+        self.module = module
+        self.var = var
+        self.value = value
+
+    def accept(self, visitor):
+        visitor.visit_timeseq(self.var, self.value)
+
+
+class DivEq:
+    def __init__(self, builder, module, var, value):
+        self.builder = builder
+        self.module = module
+        self.var = var
+        self.value = value
+
+    def accept(self, visitor):
+        visitor.visit_diveq(self.var, self.value)
+
+        
 # Defining the print function
 class Print:
     def __init__(self, builder, module, printf, value):
