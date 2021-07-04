@@ -24,7 +24,7 @@ Version 0.0.4
 ---
 Version 0.0.4 introduces the capability to increment and decrement the value of variables using the `+=` and `-=` operators, as well as the `while` loop and the ability for users to write their own functions. Functions in GOLF are defined using the `function` keyword, and the main body of the function is denoted using a pair of curly braces. 
 
-Also in this iteration of the compiler, are two new operations to acompany the `+=` and `-=` operations, namely, the `*=` and `/=` operations to multiply or divide the value of a variable by a specified amount. This iteration also changes the syntax slightly for Boolean negation, as the operator was already in use. To avoid the clash, the Boolean negation operation has been changed to a more Java-like syntax asopposed to a Haskell-like syntax, and it can now be used with the `!=` operator, but it functions the same as before. 
+Also in this iteration of the compiler, are two new operations to acompany the `+=` and `-=` operations, namely, the `*=` and `/=` operations to multiply or divide the value of a variable by a specified amount. This iteration also changes the syntax slightly for Boolean negation, as the operator was already in use. To avoid the clash, the Boolean negation operation has been changed to a more Java-like syntax as opposed to a Haskell-like syntax, and it can now be used with the `!=` operator, but it functions the same as before. 
 
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
