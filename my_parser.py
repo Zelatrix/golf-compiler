@@ -6,8 +6,8 @@ from my_ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
 from my_ast import Print, VarDeclaration, VarUsage, VarReassign, And, Or, Not
 from my_ast import IfThen, IfElse
 from my_ast import UNeg
-from my_ast import Increment, Decrement
-# from my_ast import While UserDefinedFunction
+from my_ast import Increment, Decrement, TimesEq, DivEq
+from my_ast import UserDefinedFunction, While
 
 
 class Parser:
@@ -18,9 +18,9 @@ class Parser:
         arithmetic = ["PLUS", "MINUS", "STAR", "SLASH", "MOD"]
         brackets = ["LEFT_PAR", "RIGHT_PAR", "LEFT_CURLY", "RIGHT_CURLY"]
         comparison = ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
-        keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE"]
-        other = ["SEMICOLON", "ASSIGN", "ID", "INC", "DEC"]
-        # unused = ["FUNCTION", "DBL_QUOTE", "SINGLE_QUOTE", "BOOL", "LEFT_BRACE", "RIGHT_BRACE", "WHILE", "ARRAY"]
+        keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE", "WHILE", "FUNCTION"]
+        other = ["SEMICOLON", "ASSIGN", "ID", "INC", "DEC", "TIMESEQ", "DIVEQ"]
+        # unused = ["DBL_QUOTE", "SINGLE_QUOTE", "BOOL", "LEFT_BRACE", "RIGHT_BRACE", "ARRAY"]
 
         # Joining all the tokens together into a single list
         empty = [types, booleans, arithmetic, comparison, brackets, keywords, other]
@@ -66,13 +66,24 @@ class Parser:
 
         # Increment a variable by a number
         @self.pg.production('statement : ID INC INT')
+        @self.pg.production('statement : ID INC FLOAT')
         def increment(p):
             return Increment(self.builder, self.module, p[0].getstr(), p[2].getstr())
 
         @self.pg.production('statement : ID DEC INT')
+        @self.pg.production('statement : ID DEC FLOAT')
         def decrement(p):
             return Decrement(self.builder, self.module, p[0].getstr(), p[2].getstr())
 
+        @self.pg.production('statement : ID TIMESEQ INT')
+        @self.pg.production('statement : ID TIMESEQ FLOAT')
+        def times_eq(p):
+            return TimesEq(self.builder, self.module, p[0].getstr(), p[2].getstr())
+
+        @self.pg.production('statement : ID DIVEQ INT')
+        @self.pg.production('statement : ID DIVEQ FLOAT')
+        def div_eq(p):
+            return DivEq(self.builder, self.module, p[0].getstr(), p[2].gestr())
 
         @self.pg.production('expr : ID')
         def var_use(p):
@@ -184,30 +195,24 @@ class Parser:
                 return NotEqual(self.builder, self.module, p[0], p[2])
 
         # While loops
-        # @self.pg.production('expr : WHILE LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
-        # def while_loop(p):
-        #     return While(self.builder, self.module, p[2])
+        @self.pg.production('statement : WHILE LEFT_PAR expr RIGHT_PAR LEFT_CURLY statement_list RIGHT_CURLY')
+        def while_loop(p):
+            return While(self.builder, self.module, p[2], p[5])
 
         # Arrays
         # @self.pg.production('expr : ARRAY LEFT_BRACE expr RIGHT_BRACE')
         # def array(p):
         #     pass
 
-        # Decrement a variable by a number
-        # @self.pg.production('expr : ID DEC INT')
-        # @self.pg.production('expr : ID DEC FLOAT')
-        # def decrement(variable, value):
-        #     return Decrement(self.builder, self.module)
+        # User defined functions
+        @self.pg.production('statement : FUNCTION expr LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
+        def udf(p):
+            return UserDefinedFunction(self.builder, self.module, p[1].getstr(), p[3], p[6])
 
         # Error handling
         @self.pg.error
         def error_handle(token):
             raise ValueError(token)
-        
-        # User defined functions
-        # @self.pg.production('expr : FUNCTION expr LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
-        # def udf(p):
-        #     return UserDefinedFunction(self.builder, self.module)
 
     def get_parser(self):
         return self.pg.build()
