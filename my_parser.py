@@ -1,25 +1,25 @@
 from rply import ParserGenerator
 
-from my_ast import Integer, Float, String  # , Boolean
+from my_ast import Integer, Float, String
 from my_ast import Sum, Sub, Mult, Div, Modulus
 from my_ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
 from my_ast import Print, VarDeclaration, VarUsage, VarReassign, And, Or, Not
 from my_ast import IfThen, IfElse
 from my_ast import UNeg
 from my_ast import Increment, Decrement, TimesEq, DivEq
-from my_ast import UserDefinedFunction, While
+from my_ast import UserDefinedFunction, While, Return
 
 
 class Parser:
     def __init__(self, module, builder, printf):
         # The tokens accepted by the lexer
-        types = ["INT", "FLOAT", "STRING"]  # , "CHAR"]
+        types = ["INT", "FLOAT", "STRING"]
         booleans = ["AND", "OR", "NOT", "TRUE", "FALSE"]
         arithmetic = ["PLUS", "MINUS", "STAR", "SLASH", "MOD"]
         brackets = ["LEFT_PAR", "RIGHT_PAR", "LEFT_CURLY", "RIGHT_CURLY"]
         comparison = ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
-        keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE", "WHILE", "FUNCTION"]
-        other = ["SEMICOLON", "ASSIGN", "ID", "INC", "DEC", "TIMESEQ", "DIVEQ"]
+        keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE", "WHILE", "FUNCTION", "RETURN"]
+        other = ["SEMICOLON", "ASSIGN", "ID", "INC", "DEC", "TIMESEQ", "DIVEQ"]  # "FN_NAME"]
         # unused = ["DBL_QUOTE", "SINGLE_QUOTE", "BOOL", "LEFT_BRACE", "RIGHT_BRACE", "ARRAY"]
 
         # Joining all the tokens together into a single list
@@ -30,7 +30,26 @@ class Parser:
         flat_tokens = [val for sublist in token_list for val in sublist]
 
         # Rules of precedence for the operators
-        precedence = [('left', ['PLUS', 'MINUS']), ('left', ['STAR', 'SLASH'])]
+
+        # Precedence for some of the operators was causing a large number
+        # of shift/reduce conflicts in the grammar, wherein the computer
+        # was not able to figure out whether to advance the pointer to the
+        # next token or reduce the input using the rules of the grammar
+
+        # Adding these precedences to the operators has eliminated the shift
+        # reduce conflicts
+
+        precedence = [
+                        ('left', ['PLUS', 'MINUS', 'MOD']),
+                        ('right', ['STAR', 'SLASH']),
+
+                        ('left', ['LESS_THAN', 'GREATER_THAN']),
+                        ('left', ['LESS_EQUAL', 'GREAT_EQUAL']),
+                        ('left', ['EQUAL', 'NOT_EQUAL']),
+
+                        ('left', ['AND', 'OR', 'NOT']),
+                        ('left', ['LEFT_PAR, RIGHT_PAR'])
+                     ]
 
         self.pg = ParserGenerator(flat_tokens, precedence)
         self.module = module
@@ -47,6 +66,7 @@ class Parser:
         def stmt_list(p):
             return [p[0]] + p[2]
 
+        # The empty rule
         @self.pg.production('statement_list : ')
         def empty_stmt(p):
             return []
@@ -67,21 +87,29 @@ class Parser:
         # Increment a variable by a number
         @self.pg.production('statement : ID INC INT')
         @self.pg.production('statement : ID INC FLOAT')
+        @self.pg.production('statement : ID ASSIGN ID PLUS INT')
+        @self.pg.production('statement : ID ASSIGN ID PLUS FLOAT')
         def increment(p):
             return Increment(self.builder, self.module, p[0].getstr(), p[2].getstr())
 
         @self.pg.production('statement : ID DEC INT')
         @self.pg.production('statement : ID DEC FLOAT')
+        @self.pg.production('statement : ID ASSIGN ID MINUS INT')
+        @self.pg.production('statement : ID ASSIGN ID MINUS FLOAT')
         def decrement(p):
             return Decrement(self.builder, self.module, p[0].getstr(), p[2].getstr())
 
         @self.pg.production('statement : ID TIMESEQ INT')
         @self.pg.production('statement : ID TIMESEQ FLOAT')
+        @self.pg.production('statement : ID ASSIGN ID STAR INT')
+        @self.pg.production('statement : ID ASSIGN ID STAR FLOAT')
         def times_eq(p):
             return TimesEq(self.builder, self.module, p[0].getstr(), p[2].getstr())
 
         @self.pg.production('statement : ID DIVEQ INT')
         @self.pg.production('statement : ID DIVEQ FLOAT')
+        @self.pg.production('statement : ID ASSIGN ID SLASH INT')
+        @self.pg.production('statement : ID ASSIGN ID SLASH FLOAT')
         def div_eq(p):
             return DivEq(self.builder, self.module, p[0].getstr(), p[2].gestr())
 
@@ -98,13 +126,9 @@ class Parser:
             elif p[0].gettokentype() == "FLOAT":
                 return Float(self.builder, self.module, p[0].value)
 
-        # Strings/Chars
+        # Strings
         @self.pg.production('expr : STRING')
-        # @self.pg.production('expr : CHAR')
         def string_expr(p):
-            # if len(p[0]) == 1:
-            #     return Char(self.builder, self.module, p[0].value)
-            # else:
             return String(self.builder, self.module, p[0].value)
 
         # If-then statements
@@ -135,15 +159,15 @@ class Parser:
                 return Div(self.builder, self.module, p[0], p[2])
             elif p[1].gettokentype() == 'MOD':
                 return Modulus(self.builder, self.module, p[0], p[2])
-        
+
         # Unary negation
         @self.pg.production('expr : MINUS expr')
-        def uneg_single(p):
-            return UNeg(self.builder, self.module, p[1])
-        
         @self.pg.production('expr : MINUS LEFT_PAR expr RIGHT_PAR')
         def uneg_expr(p):
-            return UNeg(self.builder, self.module, p[2])
+            if p[1].value == "(":
+                return UNeg(self.builder, self.module, p[2])
+            else:
+                return UNeg(self.builder, self.module, p[1])
 
         # Boolean And and Or
         @self.pg.production('expr : expr AND expr')
@@ -165,8 +189,10 @@ class Parser:
         def bool_expr(p):
             if p[0].gettokentype() == "TRUE":
                 return Integer(self.builder, self.module, 1)
+                # return String(self.builder, self.module, "true")
             else:
                 return Integer(self.builder, self.module, 0)
+                # return String(self.builder, self.module, "false")
 
         # Parenthesised expression
         @self.pg.production('expr : LEFT_PAR expr RIGHT_PAR')
@@ -194,20 +220,29 @@ class Parser:
             elif p[1].gettokentype() == 'NOT_EQUAL':
                 return NotEqual(self.builder, self.module, p[0], p[2])
 
-        # While loops
-        @self.pg.production('statement : WHILE LEFT_PAR expr RIGHT_PAR LEFT_CURLY statement_list RIGHT_CURLY')
-        def while_loop(p):
-            return While(self.builder, self.module, p[2], p[5])
-
         # Arrays
         # @self.pg.production('expr : ARRAY LEFT_BRACE expr RIGHT_BRACE')
         # def array(p):
         #     pass
 
-        # User defined functions
+        # While loops
+        @self.pg.production('statement : WHILE LEFT_PAR expr RIGHT_PAR LEFT_CURLY statement_list RIGHT_CURLY')
+        def while_loop(p):
+            return While(self.builder, self.module, p[2], p[5])
+
+        # # User defined functions
         @self.pg.production('statement : FUNCTION expr LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
         def udf(p):
-            return UserDefinedFunction(self.builder, self.module, p[1].getstr(), p[3], p[6])
+            pass
+        #     return UserDefinedFunction(self.builder, self.module, p[1].getstr(), p[3], p[6])
+
+        # @self.pg.production('expr : FN_NAME LEFT_PAR expr RIGHT_PAR')
+        # def udf_call(p):
+        #     pass
+
+        @self.pg.production('statement : RETURN expr')
+        def return_kw(p):
+            return Return(self.builder, self.module, p[0])
 
         # Error handling
         @self.pg.error

@@ -25,6 +25,15 @@ if "--golf" in args:
 if "--shell" in args:
     print("golf> ")
 
+if "--clear" in args:
+    files = ("output.ll", "a.exe")
+    current_dir = os.getcwd()
+    path = Path(current_dir)
+    for file in path.glob('*'):
+        f = file.name + file.stem
+        if f in files:
+            os.remove(f)
+
 """
 End of command line section
 """
@@ -34,6 +43,22 @@ End of command line section
 def find_file():
     file_arg = sys.argv[1]
     p = Path("golf_files")
+
+    # if file_arg not in p.glob("*"):
+    #     print("""
+    #          The file must be located in the same directory as the compiler's source files so
+    #          it can find the file correctly. The structure is only to improve the organisation
+    #          and I am working on a way to dynamically provide an absolute file path!
+    #          """)
+
+    # print("The directories are:")
+    # for file in p.glob("*"):
+    #     if file.is_dir():
+    #         print(file.name + "/")
+    #     else:
+    #         print("The files in the root directory are:")
+    #         print(file.name)
+
     for file in p.glob("*"):
         if file.name == file_arg:
             # Change directory
@@ -64,6 +89,7 @@ printf = codegen.printf
 pg = Parser(module, builder, printf)
 pg.parse()
 parser = pg.get_parser()
+# print(parser.parse(tokens))
 
 # Loop through the list of statements, and evaluate each one.
 for stmt in parser.parse(tokens):

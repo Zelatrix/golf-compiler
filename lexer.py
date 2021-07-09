@@ -8,6 +8,8 @@ class Lexer:
     def add_tokens(self):
         # Keywords
         self.lexer.add("FUNCTION", r"function")
+        # self.lexer.add("FN_NAME", r"[a-zA-Z_]+")
+        self.lexer.add("RETURN", r"return")
         self.lexer.add("WHILE", r"while")
         self.lexer.add("IF", r"if")
         self.lexer.add("THEN", r"then")
@@ -42,6 +44,7 @@ class Lexer:
         # Arithmetic
         self.lexer.add("PLUS", r"\+")
         self.lexer.add("MINUS", r"\-")
+        self.lexer.add("UMINUS", r"\-")
         self.lexer.add("STAR", r"\*")
         self.lexer.add("SLASH", r"\/")
         self.lexer.add("MOD", r"(mod)")

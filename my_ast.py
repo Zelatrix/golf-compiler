@@ -220,21 +220,12 @@ class String:
         self.builder = builder
         self.module = module
         self.value = value
-        self.length = len(value)
+
+    def __str__(self):
+        return str(self.value)
 
     def accept(self, visitor):
-        return visitor.visit_string(self.value, self.length)
-
-
-# Characters
-# class Char:
-#     def __init__(self, builder, module, value):
-#         self.builder = builder
-#         self.module = module
-#         self.value = value
-#
-#     def accept(self, visitor):
-#         return visitor.visit_char(self.value)
+        return visitor.visit_string(self.value)
 
 
 # If-then statements
@@ -274,11 +265,24 @@ class UserDefinedFunction:
         visitor.visit_udf(self.fn_name, self.fn_params, self.fn_body)
 
 
+# Calling a function
+class FunctionCall:
+    def __init__(self, builder, module, fn_name, fn_params):
+        self.builder = builder
+        self.module = module
+        self.fn_name = fn_name
+        self.fn_params = fn_params
+
+    def accept(self, visitor):
+        visitor.visit_fn_call(self.fn_name, self.fn_params)
+
+
 # While loops
 class While:
     def __init__(self, builder, module, predicate, body):
         self.builder = builder
         self.module = module
+        # self.var_list = var_list  # Add back the parameter to test
         self.predicate = predicate
         self.body = body
 
@@ -331,7 +335,17 @@ class DivEq:
     def accept(self, visitor):
         visitor.visit_diveq(self.var, self.value)
 
-        
+
+class Return:
+    def __init__(self, builder, module, ret_val):
+        self.builder = builder
+        self.module = module
+        self.ret_val = ret_val
+
+    def accept(self, visitor):
+        visitor.visit_return(self.ret_val)
+
+
 # Defining the print function
 class Print:
     def __init__(self, builder, module, printf, value):

@@ -1,6 +1,8 @@
+import contextlib
+
 from llvmlite import ir, binding
 from my_ast import Visitor
-from WhileContextManager import while_loop
+
 
 # Initialise all the necessary variables that are used by LLVM
 class CodeGen(Visitor):
@@ -150,56 +152,67 @@ class CodeGen(Visitor):
         return self.builder.uitofp(res, ir.DoubleType())
 
     # Visitor for strings
-    def visit_string(self, value, length):
-        pass
-        # """
-        # Helpful constants
-        # """
-        # # tmp2_args = None
-        # # str_len = ir.ArrayType(ir.IntType(8), length)  # An array of 8-bit integers the length of the string
-        # i32 = ir.IntType(32)  # An alias for 32-bit integers
-        # # binding.ValueRef.linkage = "internal"  # Setting the linkage type to internal
-        #
-        # # str_len = int(length)
-        # # str_const = ir.Constant(ir.ArrayType(ir.IntType(8), str_len), value)  # Internal string constant
-        # # print(str_const)
-        #
-        # """
-        # Defining the printf function
-        # """
-        #
-        # # If var_arg = True, then the function takes a variable number of arguments
-        # printf_ty = ir.FunctionType(i32, [ir.IntType(8).as_pointer()], var_arg=True)
-        # string_printf = ir.Function(self.module, printf_ty, name="str_printf").is_declaration
-        # return string_printf
-        #
-        # # Setting is_declaration = True tells LLVM that it is a declaration
-        # # and not a definition of a complete function; just the header.
-        # # string_printf.is_declaration
-        #
-        # """
-        # Defining the main function
-        # """
-        # fnty = ir.FunctionType(i32, [ir.IntType(8).as_pointer()])  # The type of the function
-        # func = ir.Function(self.module, fnty, name="str_main")
-        # argc, argv = func.args
-        #
-        # """
-        # The function implementation
-        # """
-        # block = func.append_basic_block(name="entry")
-        # builder = ir.IRBuilder(block)
-        # builder.gep(str_len, str_len.as_pointer(), str_const, name="tmp1")
-        # builder.call(string_printf, tmp2_args, name="tmp2")
-        # builder.ret(ir.Constant(ir.IntType(32), 0))
+    def visit_string(self, value):
+        # The horrible errors go away once you return something from
+        # the function
 
-    # Visitor for characters
-    # def visit_char(self, value):
-    #     pass
+        """
+        Some useful constants
+        """
+        str_len = len(value)
+        i32 = ir.IntType(32)
+        i8 = ir.IntType(8)
+        var_ty = ir.Constant(ir.ArrayType(ir.IntType(8), str_len), bytearray(value.encode("utf8")))
+
+        # print(var_ty)
+        # print(var_ty.type)
+
+        gbl_var = ir.GlobalVariable(self.module, var_ty.type, name="gbl_var")
+
+        # Setting up the string
+        # gep_arg1: used as basis for calculations
+        # gep_arg2: pointer or vector of pointers - base starting addr
+
+        # gep_arg1 = ir.ArrayType(i8, str_len)
+        # print(gep_arg1)
+        # gep_arg2 = gep_arg1.as_pointer()
+        # print(gep_arg2)
+
+        # gep_const1 = ir.PointerType(ir.ArrayType(i8, str_len))
+        # gep_const2 = [ir.Constant(ir.PointerType(ir.ArrayType(i8, str_len)), gep_arg2)]
+
+        """
+        Defining the print function
+        """
+        pf_ty = ir.FunctionType(i32, [i8.as_pointer()], var_arg=True)
+        pf = ir.Function(self.module, pf_ty, name="printf_str")
+        print(pf)
+
+        """
+        Defining the main function
+        """
+        main_ty = ir.FunctionType(i32, (i32, i8), var_arg=False)
+        main_fun = ir.Function(self.module, main_ty, name="main_fn")
+        main_fun.attributes.add("nounwind")
+        entry_bb = main_fun.append_basic_block(name="entry")
+
+        with self.builder.goto_block(entry_bb):
+            # print(type(var_ty))
+            vtp = ir.Constant(ir.PointerType(ir.IntType(64)), var_ty.type.as_pointer())
+            # print(vtp)
+            tmp1 = self.builder.gep(vtp, [ir.Constant(i32, 0), ir.Constant(i32, 0)])    # I don't understand how to use this instruction
+            tmp2 = self.builder.call(pf, tmp1, name="tmp2")
+            # print(tmp1)
+            # tmp2 = self.builder.call(pf, [self.builder.bitcast(gbl_var, ir.IntType(8).as_pointer())], name="tmp2")
+            tmp2.attributes.add("nounwind")
+            self.builder.ret(ir.Constant(ir.IntType(32), 0))
+
+        print(main_fun)
+        return main_fun
 
     # Visitor for UDFs
-    def visit_udf(self, name, args):
-        pass
+    # def visit_udf(self, name, args):
+    #     pass
 
     # Visitor for variables
     def visit_var_dec(self, ident, value):
@@ -286,45 +299,47 @@ class CodeGen(Visitor):
                 for stmt in else_body:
                     self.visit(stmt)
 
-    # ------ This is the kind of thing needed to implement while loops ------------
-    # LLVMBasicBlockRef while_body = LLVMAppendBasicBlock(function, "while_body");
-    # LLVMBasicBlockRef while_merge = LLVMAppendBasicBlock(function, "while_merge");
-    # LLVMBuildCondBr(builder, lower_bexp(ast->children[2]), while_body, while_merge);
-    # LLVMPositionBuilderAtEnd(builder, while_body);
-
     """
-    The while loop works by checking the condition each time through the loop
-    and if the condition is true, run the body of the loop. If it is false, 
-    then exit the loop. As long as the condition is true, jump back to the 
-    beginning of the loop
+        The while loop works by checking the condition each time through the loop
+        and if the condition is true, run the body of the loop. If it is false, 
+        then exit the loop. As long as the condition is true, jump back to the 
+        beginning of the loop
     """
-
-    # int x = 10;
-    # START: if (x > 0) {
-    #   printf("%d\n", x);
-    #   x -= 1;
-    #   goto START;
-    # }
 
     # Visitor for while loops
     def visit_while(self, predicate, body):
 
+        """
+        Some useful constants
+        """
+
         i32 = ir.IntType(32)
-        fnty = ir.FunctionType(i32, ())
-        main_fn = ir.Function(self.module, fnty, name="main_fn")
+        i8 = ir.IntType(8)
+
+        """
+        Defining the print function
+        """
+        print_ty = ir.FunctionType(i32, [i8.as_pointer()], var_arg=True)
+        print_fn = ir.Function(self.module, print_ty, name="print_fn")
+        print(print_fn)
+
+        """
+        Defining and building the main() function
+        """
+        main_ty = ir.FunctionType(i32, (i8, i32))
+        main_fn = ir.Function(self.module, main_ty, name="main_fn")
 
         # Creating the basic blocks
-        bb = self.builder.basic_block
-        # entry_bb = main_fn.append_basic_block("entry")
-        bb_cond = main_fn.append_basic_block("entry.cond")
-        bb_if = main_fn.append_basic_block("entry.if")
-        bb_end = main_fn.append_basic_block("entry.endif")
-        self.builder.branch(bb_cond)
+        bb = self.builder.block  # The current basic block
+        entry_bb = main_fn.append_basic_block("entry")  # The entry block
+        bb_cond = main_fn.append_basic_block("entry.cond")  # The block that holds the condition
+        bb_if = main_fn.append_basic_block("entry.if")  # If the condition is true
+        bb_end = main_fn.append_basic_block("entry.endif")  # If the loop has finished
 
         # Prepare the variables to enter the loop
-        # with self.builder.goto_block(entry_bb):
-        #     # for instr in list(bb):
-        #     pass
+        # This is the function's entry block
+        with self.builder.goto_block(entry_bb):
+            self.builder.branch(bb_cond)
 
         with self.builder.goto_block(bb_cond):
             p = self.visit(predicate)
@@ -336,21 +351,14 @@ class CodeGen(Visitor):
                 self.visit(stmt)
             self.builder.branch(bb_cond)
 
-        # Insert a `ret void` instruction into the basic block `entry.endif`
-        # and move the pointer back to its original location
         with self.builder.goto_block(bb_end):
             self.builder.ret_void()
 
-        # print(entry_bb)
-        print("This is the entry block:")
         print(bb)
-
-        print()
-        print("This is the main function:")
         print(main_fn)
-        # print(bb_cond)
-        # print(bb_if)
-        # print(bb_end)
+
+    def visit_return(self, ret_val):
+        self.builder.ret(ret_val)
 
     # Declare the function that is used for printing text to the console.
     def _declare_print_function(self):
