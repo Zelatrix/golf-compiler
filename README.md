@@ -28,7 +28,12 @@ Version 0.3.0 introduces the capability to increment and decrement the value of 
 
 Also in this iteration of the compiler, are two new operations to acompany the `+=` and `-=` operations, namely, the `*=` and `/=` operations to multiply or divide the value of a variable by a specified amount. This iteration also changes the syntax slightly for Boolean negation, as the operator was already in use. To avoid the clash, the Boolean negation operation has been changed to a more Java-like syntax as opposed to a Haskell-like syntax, and it can now be used with the `!=` operator, but it functions the same as before. 
 
+Version 0.3.1
+---
+Version 0.3.1 adds a suite of automated tests to allow for easier use and program verification. The user will be able to test multiple source files with a single command, rather than running each of the test files individually, which is a potentially time-consuming process.    
+
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
 - https://tomassetti.me/ebnf/
 - https://llvm.discourse.group/t/implementing-in-llvm-ir/3744
+- https://github.com/numba/llvmlite/issues/742
