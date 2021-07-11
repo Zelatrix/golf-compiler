@@ -37,6 +37,8 @@ class CodeGen(Visitor):
         base_func = ir.Function(self.module, func_type, name="main")
         block = base_func.append_basic_block(name="entry")
         self.builder = ir.IRBuilder(block)
+        # print(base_func)
+        # print(block)
 
     def _create_execution_engine(self):
         target = self.binding.Target.from_default_triple()
@@ -162,7 +164,8 @@ class CodeGen(Visitor):
         str_len = len(value)
         i32 = ir.IntType(32)
         i8 = ir.IntType(8)
-        var_ty = ir.Constant(ir.ArrayType(ir.IntType(8), str_len), bytearray(value.encode("utf8")))
+        str_const = bytearray(value.encode("utf-8"))
+        var_ty = ir.Constant(ir.ArrayType(ir.IntType(8), str_len), str_const)
 
         # print(var_ty)
         # print(var_ty.type)
@@ -198,12 +201,12 @@ class CodeGen(Visitor):
 
         with self.builder.goto_block(entry_bb):
             # print(type(var_ty))
-            vtp = ir.Constant(ir.PointerType(ir.IntType(64)), var_ty.type.as_pointer())
+            # vtp = var_ty
             # print(vtp)
-            tmp1 = self.builder.gep(vtp, [ir.Constant(i32, 0), ir.Constant(i32, 0)])    # I don't understand how to use this instruction
-            tmp2 = self.builder.call(pf, tmp1, name="tmp2")
+            # tmp1 = self.builder.gep(var_ty, [ir.Constant(ir.IntType(32), 0), ir.Constant(ir.IntType(32), 0)])  # I don't understand how to use this instruction
+            # tmp2 = self.builder.call(pf, tmp1, name="tmp2")
             # print(tmp1)
-            # tmp2 = self.builder.call(pf, [self.builder.bitcast(gbl_var, ir.IntType(8).as_pointer())], name="tmp2")
+            tmp2 = self.builder.call(pf, [self.builder.bitcast(gbl_var, ir.IntType(8).as_pointer())], name="tmp2")
             tmp2.attributes.add("nounwind")
             self.builder.ret(ir.Constant(ir.IntType(32), 0))
 
@@ -299,6 +302,10 @@ class CodeGen(Visitor):
                 for stmt in else_body:
                     self.visit(stmt)
 
+    def visit_else(self, else_body):
+        for stmt in else_body:
+            self.visit(stmt)
+
     """
         The while loop works by checking the condition each time through the loop
         and if the condition is true, run the body of the loop. If it is false, 
@@ -313,6 +320,7 @@ class CodeGen(Visitor):
         Some useful constants
         """
 
+        i64 = ir.IntType(64)
         i32 = ir.IntType(32)
         i8 = ir.IntType(8)
 
@@ -326,7 +334,7 @@ class CodeGen(Visitor):
         """
         Defining and building the main() function
         """
-        main_ty = ir.FunctionType(i32, (i8, i32))
+        main_ty = ir.FunctionType(i32, (i8, i64.as_pointer()))
         main_fn = ir.Function(self.module, main_ty, name="main_fn")
 
         # Creating the basic blocks
@@ -339,6 +347,10 @@ class CodeGen(Visitor):
         # Prepare the variables to enter the loop
         # This is the function's entry block
         with self.builder.goto_block(entry_bb):
+            # self.builder.bitcast(self.symbol_table['x'], ir.IntType(64).as_pointer())
+            # addr = self.builder.alloca(ir.DoubleType())
+            # load_addr = self.builder.load(addr)
+            # self.builder.store(ir.Constant(ir.DoubleType(), 10), addr)
             self.builder.branch(bb_cond)
 
         with self.builder.goto_block(bb_cond):
@@ -352,10 +364,27 @@ class CodeGen(Visitor):
             self.builder.branch(bb_cond)
 
         with self.builder.goto_block(bb_end):
-            self.builder.ret_void()
+            self.builder.ret(ir.Constant(ir.IntType(32), 0))
 
         print(bb)
         print(main_fn)
+
+        # p = self.visit(predicate)
+        # bool_cond = self.builder.fptosi(p, ir.IntType(1))  # The Boolean condition for continuing the loop
+        #
+        # while_builder = ir.IRBuilder()
+        # while_block = while_builder.block
+        #
+        # with while_builder.block.if_then(bool_cond):
+        #     cond = while_builder.append_basic_block("cond")
+        #     with while_builder.goto_block(cond):
+        #         for stmt in body:
+        #             self.visit(stmt)
+        # print(while_block)
+
+        # with self.builder.if_then(bool_cond):
+        #     cond_blk = self.builder.append_basic_block("cond")
+        #     self.builder.goto_block(cond_blk)
 
     def visit_return(self, ret_val):
         self.builder.ret(ret_val)

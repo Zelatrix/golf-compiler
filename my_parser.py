@@ -4,7 +4,7 @@ from my_ast import Integer, Float, String
 from my_ast import Sum, Sub, Mult, Div, Modulus
 from my_ast import Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual
 from my_ast import Print, VarDeclaration, VarUsage, VarReassign, And, Or, Not
-from my_ast import IfThen, IfElse
+from my_ast import IfThen, IfElse, ElseBlock
 from my_ast import UNeg
 from my_ast import Increment, Decrement, TimesEq, DivEq
 from my_ast import UserDefinedFunction, While, Return
@@ -141,6 +141,10 @@ class Parser:
                             'ELSE LEFT_CURLY statement_list RIGHT_CURLY')
         def if_else(p):
             return IfElse(self.builder, self.module, p[1], p[4], p[8])
+
+        @self.pg.production('statement : ELSE LEFT_CURLY statement_list RIGHT_CURLY statement_list')
+        def else_statement(p):
+            return ElseBlock(self.builder, self.module, p[2])
 
         # Arithmetic
         @self.pg.production('expr : expr PLUS expr')

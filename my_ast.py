@@ -252,6 +252,16 @@ class IfElse:
         return visitor.visit_if_else(self.predicate, self.if_body, self.else_body)
 
 
+class ElseBlock:
+    def __init__(self, builder, module, else_body):
+        self.builder = builder
+        self.module = module
+        self.else_body = else_body
+
+    def accept(self, visitor):
+        return visitor.visit_else(self.else_body)
+
+
 # User defined functions
 class UserDefinedFunction:
     def __init__(self, builder, module, fn_name, fn_params, fn_body):

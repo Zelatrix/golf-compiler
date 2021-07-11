@@ -102,7 +102,26 @@ if expr then {
 };
 ```
 
-While loops in GOLF have thw following syntax:
+It is also possible to have singlular else statements in GOLF. Else block have the structure
+
+```
+else {
+   // insert some code here
+};
+```
+and, because GOLF does not have a specific structure for handling conditions inside `else` blocks, control flow inside `else` blocks can be achieved by putting an `if` statement inside the `else` block, as the contents of an `else` block is simply a list of legal program statements, and the `if` statement is an example of a legal statement in the language. Combining `else` and `if` to add more conditions to a program can be done using the following syntactical structure:
+
+```
+else {
+   if condition then {
+      // code to be run goes here 
+   };
+};
+```
+
+NOTE: Because both `else` and `if-then` blocks are statements in the language, they must both end their blocks with a semicolon. 
+
+While loops in GOLF have the following syntax:
 
 ```
 var x := 10;

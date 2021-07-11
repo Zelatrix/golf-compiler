@@ -15,8 +15,8 @@ for arg in sys.argv:
 
 # Golf mode
 if "--golf" in args:
-    with open(sys.argv[1]) as source:
-        if len(source.read()) > 5000:
+    with open(sys.argv[1]) as f:
+        if len(f.read()) > 5000:
             print("File too long!")
             print("In Golf mode, files must not exceed 5000 characters!")
             exit()
@@ -26,7 +26,7 @@ if "--shell" in args:
     print("golf> ")
 
 if "--clear" in args:
-    files = ("output.ll", "a.exe")
+    files = (Path(f"{sys.argv[1]}.ll"), "a.exe")
     current_dir = os.getcwd()
     path = Path(current_dir)
     for file in path.glob('*'):
@@ -44,28 +44,15 @@ def find_file():
     file_arg = sys.argv[1]
     p = Path("golf_files")
 
-    # if file_arg not in p.glob("*"):
-    #     print("""
-    #          The file must be located in the same directory as the compiler's source files so
-    #          it can find the file correctly. The structure is only to improve the organisation
-    #          and I am working on a way to dynamically provide an absolute file path!
-    #          """)
-
-    # print("The directories are:")
-    # for file in p.glob("*"):
-    #     if file.is_dir():
-    #         print(file.name + "/")
-    #     else:
-    #         print("The files in the root directory are:")
-    #         print(file.name)
-
-    for file in p.glob("*"):
+    for file in p.rglob("*"):
         if file.name == file_arg:
+            parents = list(file.parents)
+            idx_0 = str(parents[0])
             # Change directory
-            os.chdir(str(p))
+            os.chdir(idx_0)
             # Reading the source file
-            with open(file_arg) as f:
-                return f.read()
+            with open(file_arg) as source:
+                return source.read()
 
 
 text_input = find_file()
@@ -98,5 +85,10 @@ for stmt in parser.parse(tokens):
 
 # Save the IR representation into an LL file
 codegen.create_ir()
-os.chdir("..")
-codegen.save_ir("output.ll")
+
+# Construct the path to the location where the compiled files are kept
+parts = Path(os.getcwd()).parts
+newpath = parts[0] + parts[1]
+
+os.chdir(rf"{newpath}/compiled_tests")
+codegen.save_ir(f"{Path(sys.argv[1]).stem}.ll")
