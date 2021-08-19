@@ -18,14 +18,26 @@ class ArithmeticTest(unittest.TestCase):
     def test_multiply(self):
         subprocess.call(["python", "main.py", "multiply.golf"])
         subprocess.call(["clang", "compiled_tests/multiply.ll"])
-        sub_output = subprocess.Popen(["a.exe"], stdout=subprocess.PIPE).communicate()[0]
-        self.assertAlmostEqual(float(sub_output.strip()), 12.0)
+        mult_output = subprocess.Popen(["a.exe"], stdout=subprocess.PIPE).communicate()[0]
+        self.assertAlmostEqual(float(mult_output.strip()), 12.0)
 
     def test_divide(self):
         subprocess.call(["python", "main.py", "normal_divide.golf"])
         subprocess.call(["clang", "compiled_tests/normal_divide.ll"])
-        sub_output = subprocess.Popen(["a.exe"], stdout=subprocess.PIPE).communicate()[0]
-        self.assertAlmostEqual(float(sub_output.strip()), 2.0)
+        div_output = subprocess.Popen(["a.exe"], stdout=subprocess.PIPE).communicate()[0]
+        self.assertAlmostEqual(float(div_output.strip()), 2.0)
+
+    def test_increment(self):
+        subprocess.call(["python", "main.py", "increment.golf"])
+        subprocess.call(["clang", "compiled_tests/increment.ll"])
+        inc_output = subprocess.Popen(["a.exe"], stdout=subprocess.PIPE).communicate()[0]
+        self.assertAlmostEqual(float(inc_output.strip()), 5.1)
+
+    def test_decrement(self):
+        subprocess.call(["python", "main.py", "decrement_test.golf"])
+        subprocess.call(["clang", "compiled_tests/decrement_test.ll"])
+        dec_output = subprocess.Popen(["a.exe"], stdout=subprocess.PIPE).communicate()[0]
+        self.assertAlmostEqual(float(dec_output.strip()), -1.2)
 
 
 if __name__ == '__main__':
