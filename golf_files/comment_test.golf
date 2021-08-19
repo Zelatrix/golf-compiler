@@ -1,2 +1,0 @@
-// I am a comment and I should be ignored
-print(2 + 3);
