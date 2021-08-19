@@ -131,3 +131,12 @@ while(x > 0) {
 }
 ```
 The above program produces the numbers from 1 to 10 in reverse. 
+
+Running Unit Tests
+---
+In the project's `unit_tests/` directory, there are some Python unit tests that can be run. These tests execute the basic operations and show that they work as expected. In order to run the tests, issue the following command:
+
+```
+python -m unittest discover -s unit_tests -p *_test.py
+```
+
