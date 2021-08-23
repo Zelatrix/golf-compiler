@@ -1,0 +1,7 @@
+var x := 1;
+var y := 10;
+while(y > 0) {
+    print(x);
+    x *= 2;
+    y -= 1;
+};

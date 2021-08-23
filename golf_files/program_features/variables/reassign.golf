@@ -1,0 +1,4 @@
+var x := 3;
+print(x);
+x := 27;
+print(x);
