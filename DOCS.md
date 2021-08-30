@@ -139,4 +139,4 @@ In the project's `unit_tests/` directory, there are some Python unit tests that 
 ```
 python -m unittest discover -s unit_tests -p *_test.py
 ```
-NOTE: There is a odd bug of sorts with the testing process. I have not yet pinned down why this happens, but there will be times when all the tests will run successfully, and other times some or most of the tests will fail. This happens even when I give both runs of tests the same input files, and I have not mde any changes to the source files. 
+NOTE: There is a odd bug of sorts with the testing process. I have not yet pinned down why this happens, but there will be times when all the tests will run successfully, and other times some or most of the tests will fail. This happens even when I give both runs of tests the same input files, and I have not made any changes to the source files. 
