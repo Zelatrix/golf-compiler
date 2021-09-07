@@ -389,6 +389,9 @@ class CodeGen(Visitor):
     def visit_return(self, ret_val):
         self.builder.ret(ret_val)
 
+    def visit_specification(self):
+        print("Visited!")
+
     # Declare the function that is used for printing text to the console.
     def _declare_print_function(self):
         voidptr_ty = ir.IntType(64).as_pointer()

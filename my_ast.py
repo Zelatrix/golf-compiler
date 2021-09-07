@@ -356,6 +356,28 @@ class Return:
         visitor.visit_return(self.ret_val)
 
 
+class Is:
+    def __init__(self, builder, module, expr):
+        self.builder = builder
+        self.module = module
+        self.expr = expr
+
+    def accept(self, visitor):
+        # pass
+        visitor.visit_is(self.expr)
+
+
+# A class representing the optional proof specifications.
+class Specification:
+    def __init__(self, builder, module, expr):
+        self.builder = builder
+        self.module = module
+        self.expr = expr
+
+    def accept(self, visitor):
+        visitor.visit_specification(self.expr)
+        # print(self.expr)
+
 # Defining the print function
 class Print:
     def __init__(self, builder, module, printf, value):

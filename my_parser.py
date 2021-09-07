@@ -8,6 +8,7 @@ from my_ast import IfThen, IfElse, ElseBlock
 from my_ast import UNeg
 from my_ast import Increment, Decrement, TimesEq, DivEq
 from my_ast import UserDefinedFunction, While, Return
+from my_ast import Specification, Is
 
 
 class Parser:
@@ -20,10 +21,11 @@ class Parser:
         comparison = ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
         keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE", "WHILE", "FUNCTION", "RETURN"]
         other = ["SEMICOLON", "ASSIGN", "ID", "INC", "DEC", "TIMESEQ", "DIVEQ"]  # "FN_NAME"]
+        verification = ["IS"]
         # unused = ["DBL_QUOTE", "SINGLE_QUOTE", "BOOL", "LEFT_BRACE", "RIGHT_BRACE", "ARRAY"]
 
         # Joining all the tokens together into a single list
-        empty = [types, booleans, arithmetic, comparison, brackets, keywords, other]
+        empty = [types, booleans, arithmetic, comparison, brackets, keywords, verification, other]
         token_list = empty
 
         # Flatten the nested list of tokens
@@ -246,7 +248,27 @@ class Parser:
 
         @self.pg.production('statement : RETURN expr')
         def return_kw(p):
-            return Return(self.builder, self.module, p[0])
+            return Return(self.builder, self.module, p[1])
+
+        # Parsing for optional specifications
+        @self.pg.production('spec : ID IS expr')            # Assignment
+        @self.pg.production('spec : ID LESS_THAN expr')     # Less-than
+        @self.pg.production('spec : ID LESS_EQUAL expr')    # Less-than-equal
+        @self.pg.production('spec : ID GREATER_THAN expr')  # Greater-than
+        @self.pg.production('spec : ID GREAT_EQUAL expr')   # Greater-than-equal
+        def parse_specification(p):
+            # pass
+            return Specification(self.builder, self.module, p[2])
+
+        @self.pg.production('conj_spec : LEFT_CURLY spec RIGHT_CURLY')
+        @self.pg.production('conj_spec : LEFT_CURLY spec AND conj_spec RIGHT_CURLY')
+        def conj_spec(p):
+            pass
+
+        # # The empty specification
+        @self.pg.production('spec : ')
+        def parse_empty_spec(p):
+            pass
 
         # Error handling
         @self.pg.error

@@ -77,6 +77,10 @@ class Lexer:
         self.lexer.add("LEFT_CURLY", r"\{")
         self.lexer.add("RIGHT_CURLY", r"\}")
 
+        # Verification axioms
+        self.lexer.add("IS", r"=")
+
+
     # Add the tokens to the lexer
     # Build the lexer
     def get_lexer(self):

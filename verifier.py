@@ -1,5 +1,6 @@
 from z3 import *
 import nltk.sem.logic
+from my_ast import *
 
 # Assignment
 # {P} V := E {Q}

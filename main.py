@@ -78,6 +78,9 @@ text_input = find_file()
 lexer = Lexer().get_lexer()
 tokens = lexer.lex(text_input)
 
+# for tok in tokens:
+#     print(tok)
+
 # Create a code generator object
 codegen = CodeGen()
 
@@ -96,14 +99,14 @@ parser = pg.get_parser()
 for stmt in parser.parse(tokens):
     codegen.visit(stmt)
     # print(stmt)
-
-# Save the IR representation into an LL file
-codegen.create_ir()
-
-if platform.system() in ["Windows", "Linux", "Darwin"]:
-    os.chdir(current_dir)
-    os.chdir("compiled_tests")
-    codegen.save_ir(f"{Path(sys.argv[1]).stem}.ll")
-else:
-    print(f"We do not support {platform.system()}!")
-    print("Sorry about that!")
+#
+# # Save the IR representation into an LL file
+# codegen.create_ir()
+#
+# if platform.system() in ["Windows", "Linux", "Darwin"]:
+#     os.chdir(current_dir)
+#     os.chdir("compiled_tests")
+#     codegen.save_ir(f"{Path(sys.argv[1]).stem}.ll")
+# else:
+#     print(f"We do not support {platform.system()}!")
+#     print("Sorry about that!")
