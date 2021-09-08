@@ -42,16 +42,16 @@ class Parser:
         # reduce conflicts
 
         precedence = [
-                        ('left', ['PLUS', 'MINUS', 'MOD']),
-                        ('right', ['STAR', 'SLASH']),
+            ('left', ['PLUS', 'MINUS', 'MOD']),
+            ('right', ['STAR', 'SLASH']),
 
-                        ('left', ['LESS_THAN', 'GREATER_THAN']),
-                        ('left', ['LESS_EQUAL', 'GREAT_EQUAL']),
-                        ('left', ['EQUAL', 'NOT_EQUAL']),
+            ('left', ['LESS_THAN', 'GREATER_THAN']),
+            ('left', ['LESS_EQUAL', 'GREAT_EQUAL']),
+            ('left', ['EQUAL', 'NOT_EQUAL']),
 
-                        ('left', ['AND', 'OR', 'NOT']),
-                        ('left', ['LEFT_PAR, RIGHT_PAR'])
-                     ]
+            ('left', ['AND', 'OR', 'NOT']),
+            ('left', ['LEFT_PAR, RIGHT_PAR'])
+        ]
 
         self.pg = ParserGenerator(flat_tokens, precedence)
         self.module = module
@@ -65,11 +65,11 @@ class Parser:
             return p[0]
 
         # Parsing for optional specifications
-        @self.pg.production('spec : ID IS expr')            # Assignment
-        @self.pg.production('spec : ID LESS_THAN expr')     # Less-than
-        @self.pg.production('spec : ID LESS_EQUAL expr')    # Less-than-equal
+        @self.pg.production('spec : ID IS expr')  # Assignment
+        @self.pg.production('spec : ID LESS_THAN expr')  # Less-than
+        @self.pg.production('spec : ID LESS_EQUAL expr')  # Less-than-equal
         @self.pg.production('spec : ID GREATER_THAN expr')  # Greater-than
-        @self.pg.production('spec : ID GREAT_EQUAL expr')   # Greater-than-equal
+        @self.pg.production('spec : ID GREAT_EQUAL expr')  # Greater-than-equal
         def parse_specification(p):
             # pass
             return Specification(self.builder, self.module, p[2])
@@ -88,18 +88,22 @@ class Parser:
         # def parse_empty_spec(p):
         #     pass
 
-        @self.pg.production('statement_list : single_spec statement SEMICOLON statement_list')
         @self.pg.production('statement_list : statement SEMICOLON statement_list')
+        @self.pg.production('statement_list : single_spec statement SEMICOLON statement_list')
         def stmt_list(p):
-            if p[1].gettokentype() == "SEMICOLON":
+            if p[1].value == ";":
                 return [p[0]] + p[2]
             else:
-                return [p[0] + [p[1]] + p[2]]
+                return [p[0] + p[1]] + p[2]
 
         # The empty rule
         @self.pg.production('statement_list : ')
         def empty_stmt(p):
             return []
+
+        @self.pg.production('statement_list : conj_spec')
+        def end_conj(p):
+            return p[0]
 
         @self.pg.production('statement : PRINT LEFT_PAR expr RIGHT_PAR')
         def print_statement(p):
@@ -141,7 +145,7 @@ class Parser:
         @self.pg.production('statement : ID ASSIGN ID SLASH INT')
         @self.pg.production('statement : ID ASSIGN ID SLASH FLOAT')
         def div_eq(p):
-            return DivEq(self.builder, self.module, p[0].getstr(), p[2].gestr())
+            return DivEq(self.builder, self.module, p[0].getstr(), p[2].getstr())
 
         @self.pg.production('expr : ID')
         def var_use(p):
@@ -268,6 +272,7 @@ class Parser:
         @self.pg.production('statement : FUNCTION expr LEFT_PAR expr RIGHT_PAR LEFT_CURLY expr RIGHT_CURLY')
         def udf(p):
             pass
+
         #     return UserDefinedFunction(self.builder, self.module, p[1].getstr(), p[3], p[6])
 
         # @self.pg.production('expr : FN_NAME LEFT_PAR expr RIGHT_PAR')
