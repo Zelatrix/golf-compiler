@@ -8,7 +8,7 @@ from my_ast import IfThen, IfElse, ElseBlock
 from my_ast import UNeg
 from my_ast import Increment, Decrement, TimesEq, DivEq
 from my_ast import UserDefinedFunction, While, Return
-from my_ast import Specification, Is
+from my_ast import Specification, ConjSpec, SingleSpec, Is
 
 
 class Parser:
@@ -64,9 +64,37 @@ class Parser:
         def program(p):
             return p[0]
 
+        # Parsing for optional specifications
+        @self.pg.production('spec : ID IS expr')            # Assignment
+        @self.pg.production('spec : ID LESS_THAN expr')     # Less-than
+        @self.pg.production('spec : ID LESS_EQUAL expr')    # Less-than-equal
+        @self.pg.production('spec : ID GREATER_THAN expr')  # Greater-than
+        @self.pg.production('spec : ID GREAT_EQUAL expr')   # Greater-than-equal
+        def parse_specification(p):
+            # pass
+            return Specification(self.builder, self.module, p[2])
+
+        @self.pg.production('conj_spec : spec')
+        @self.pg.production('conj_spec : spec AND conj_spec')
+        def conj_spec(p):
+            return ConjSpec(self.builder, self.module, p[0])
+
+        @self.pg.production('single_spec : LEFT_CURLY conj_spec RIGHT_CURLY')
+        def single_spec(p):
+            return SingleSpec(self.builder, self.module, p[1])
+
+        # The empty specification
+        # @self.pg.production('spec : ')
+        # def parse_empty_spec(p):
+        #     pass
+
+        @self.pg.production('statement_list : single_spec statement SEMICOLON statement_list')
         @self.pg.production('statement_list : statement SEMICOLON statement_list')
         def stmt_list(p):
-            return [p[0]] + p[2]
+            if p[1].gettokentype() == "SEMICOLON":
+                return [p[0]] + p[2]
+            else:
+                return [p[0] + [p[1]] + p[2]]
 
         # The empty rule
         @self.pg.production('statement_list : ')
@@ -249,26 +277,6 @@ class Parser:
         @self.pg.production('statement : RETURN expr')
         def return_kw(p):
             return Return(self.builder, self.module, p[1])
-
-        # Parsing for optional specifications
-        @self.pg.production('spec : ID IS expr')            # Assignment
-        @self.pg.production('spec : ID LESS_THAN expr')     # Less-than
-        @self.pg.production('spec : ID LESS_EQUAL expr')    # Less-than-equal
-        @self.pg.production('spec : ID GREATER_THAN expr')  # Greater-than
-        @self.pg.production('spec : ID GREAT_EQUAL expr')   # Greater-than-equal
-        def parse_specification(p):
-            # pass
-            return Specification(self.builder, self.module, p[2])
-
-        @self.pg.production('conj_spec : LEFT_CURLY spec RIGHT_CURLY')
-        @self.pg.production('conj_spec : LEFT_CURLY spec AND conj_spec RIGHT_CURLY')
-        def conj_spec(p):
-            pass
-
-        # # The empty specification
-        @self.pg.production('spec : ')
-        def parse_empty_spec(p):
-            pass
 
         # Error handling
         @self.pg.error

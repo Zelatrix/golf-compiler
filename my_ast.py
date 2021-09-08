@@ -378,6 +378,28 @@ class Specification:
         visitor.visit_specification(self.expr)
         # print(self.expr)
 
+
+# A class representing conjunctions of specification instances
+class ConjSpec:
+    def __init__(self, builder, module, expr):
+        self.builder = builder
+        self.module = module
+        self.expr = expr
+
+    def accept(self, visitor):
+        visitor.visit_conj_spec(self.expr)
+
+
+class SingleSpec:
+    def __init__(self, builder, module, expr):
+        self.builder = builder
+        self.module = module
+        self.expr = expr
+
+    def accept(self, visitor):
+        visitor.visit_single_spec(self.expr)
+
+
 # Defining the print function
 class Print:
     def __init__(self, builder, module, printf, value):

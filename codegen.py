@@ -389,6 +389,9 @@ class CodeGen(Visitor):
     def visit_return(self, ret_val):
         self.builder.ret(ret_val)
 
+    def visit_conj_spec(self):
+        print("Visited!")
+
     def visit_specification(self):
         print("Visited!")
 
