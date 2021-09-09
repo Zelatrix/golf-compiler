@@ -74,19 +74,17 @@ class Parser:
             # pass
             return Specification(self.builder, self.module, p[2])
 
-        @self.pg.production('conj_spec : spec')
         @self.pg.production('conj_spec : spec AND conj_spec')
         def conj_spec(p):
-            return ConjSpec(self.builder, self.module, p[0])
+            return ConjSpec(self.builder, self.module, p[0], p[2])
+
+        @self.pg.production('conj_spec : spec')
+        def end_spec(p):
+            return Specification(self.builder, self.module, p[0])
 
         @self.pg.production('single_spec : LEFT_CURLY conj_spec RIGHT_CURLY')
         def single_spec(p):
             return SingleSpec(self.builder, self.module, p[1])
-
-        # The empty specification
-        # @self.pg.production('spec : ')
-        # def parse_empty_spec(p):
-        #     pass
 
         @self.pg.production('statement_list : statement SEMICOLON statement_list')
         @self.pg.production('statement_list : single_spec statement SEMICOLON statement_list')
@@ -94,16 +92,16 @@ class Parser:
             if p[1].value == ";":
                 return [p[0]] + p[2]
             else:
-                return [p[0] + p[1]] + p[2]
+                return [(p[0], p[1])] + [p[3]]
 
         # The empty rule
         @self.pg.production('statement_list : ')
         def empty_stmt(p):
             return []
 
-        @self.pg.production('statement_list : conj_spec')
-        def end_conj(p):
-            return p[0]
+        @self.pg.production('statement_list : single_spec')
+        def end_single(p):
+            return [p[0]]
 
         @self.pg.production('statement : PRINT LEFT_PAR expr RIGHT_PAR')
         def print_statement(p):

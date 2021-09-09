@@ -93,12 +93,12 @@ printf = codegen.printf
 pg = Parser(module, builder, printf)
 pg.parse()
 parser = pg.get_parser()
-print(parser.parse(tokens))
+# print(parser.parse(tokens))
 
 # Loop through the list of statements, and evaluate each one.
-# for stmt in parser.parse(tokens):
+for stmt in parser.parse(tokens):
     # codegen.visit(stmt)
-    # print(stmt)
+    print(stmt)
 #
 # # Save the IR representation into an LL file
 # codegen.create_ir()

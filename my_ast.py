@@ -381,13 +381,14 @@ class Specification:
 
 # A class representing conjunctions of specification instances
 class ConjSpec:
-    def __init__(self, builder, module, expr):
+    def __init__(self, builder, module, e1, rest):
         self.builder = builder
         self.module = module
-        self.expr = expr
+        self.e1 = e1
+        self.rest = rest
 
     def accept(self, visitor):
-        visitor.visit_conj_spec(self.expr)
+        visitor.visit_conj_spec(self.e1, self.rest)
 
 
 class SingleSpec:
