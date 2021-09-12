@@ -32,6 +32,11 @@ Version 0.3.1
 ---
 Version 0.3.1 adds a suite of automated tests to allow for easier use and program verification. The user will be able to test multiple source files with a single command, rather than running each of the test files individually, which is a potentially time-consuming process.    
 
+Version 0.3.2
+---
+This version introduces the ability for users to add specifications to the file, which are of the form `{x = 0}`. Such a specification means that the compiler is expecting the variable `x` to have a value of 0, and this can then be used to verify whether the provided specifications are valid
+
+
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
 - https://tomassetti.me/ebnf/
