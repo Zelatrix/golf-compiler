@@ -1,0 +1,19 @@
+TODO: 
+	- Extend the arithmetic operators so that they work on both variables and numerical types
+	- Implement arrays (code generation)
+		- Declaring an array
+		- Accessing an element of an array
+		- Assigning a value to a space in an array
+	- Strings 
+	- Types
+	- Pass type information to a general print() function
+		- At the moment, the print() function can only be called on 
+		  numerical types
+
+DONE:
+- Lexing of `var x := array[3];`
+- Parsing of `var x := array[3];`
+- Lexing of `array[3] := 23;`
+- Parsing of `array[3] := 23;`
+- Lexing of `array[3]`
+- Parsing of `array[3]`
