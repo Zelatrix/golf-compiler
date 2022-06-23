@@ -1,0 +1,31 @@
+// Answers:
+// 10
+// 11
+var w := 10;
+print(w);
+w += 1;
+print(w);
+
+// Answers:
+// 10
+// 9
+var x := 10;
+print(x);
+x -= 1;
+print(x);
+
+// Answers:
+// 10
+// 20
+var y := 10;
+print(y);
+y *= 2;
+print(y);
+
+// Answers:
+// 10
+// 2
+var z := 10;
+print(z);
+z /= 5;
+print(z);
