@@ -1,0 +1,9 @@
+function myfun() {
+    var x := 2;
+    var y := 3;
+    var z := x + y;
+    // return 0;
+    print(z);
+};
+
+// myfun();

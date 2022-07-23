@@ -1,0 +1,5 @@
+var x := 23.5;
+var y := 19.5;
+//print(x + y);
+print(x);
+print(y);
