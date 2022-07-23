@@ -132,6 +132,16 @@ while(x > 0) {
 ```
 The above program produces the numbers from 1 to 10 in reverse. 
 
+Functions
+---
+In GOLF, functions are defined using the `function` keyword. A function signature consists of a name, the arguments to the function, and the return type of that function. Each function argument *must* be given a type. The syntax for a function declaration in GOLF is the following: 
+
+```
+function f(int x) -> void {
+    print(x);
+};
+```
+
 Running Unit Tests
 ---
 In the project's `unit_tests/` directory, there are some Python unit tests that can be run. These tests execute the basic operations and show that they work as expected. In order to run the tests, issue the following command:
