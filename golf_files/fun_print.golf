@@ -1,0 +1,11 @@
+function f() -> void {
+	var x := 2;
+	print(x);
+};
+
+function g(int x) -> void {
+	print(x);
+};
+
+f();
+// g(2);

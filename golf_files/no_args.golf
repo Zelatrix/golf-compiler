@@ -1,0 +1,6 @@
+function f() -> int {
+    var x := 2;
+    print(x);
+};
+
+f();

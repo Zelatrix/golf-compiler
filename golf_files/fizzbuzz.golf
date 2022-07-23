@@ -1,0 +1,21 @@
+var iters := 0;
+
+while(iters < 20) {
+    if ((iters mod 3) == 0) and ((iters mod 5) == 0) then {
+        print(1); //FizzBuzz
+				iters += 1;
+    } else {
+        if ((iters mod 3) == 0) then {
+            print(2); //Fizz
+						iters += 1;
+        };
+    }; else {
+        if ((iters mod 5) == 0) then {
+            print(3); //Buzz
+						iters += 1;
+        };
+    }; else {
+        print(iters);
+				iters += 1;
+    };
+};

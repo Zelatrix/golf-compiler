@@ -1,0 +1,6 @@
+// Defining a function, but omitting the return type
+// to force an error to occur
+function f() {
+
+};
+

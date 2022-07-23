@@ -1,0 +1,8 @@
+var i := 0;
+var j := 6;
+
+// While i < 3:
+while (i < j / 2) {
+	print(i);
+	i += 1;
+}; 

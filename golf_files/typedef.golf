@@ -1,0 +1,30 @@
+// External variables
+//var x := 2;
+//var y := 3;
+//print(x + y);
+
+function f(int x) -> int {
+	// x := x + 1;
+};
+
+// Testing a function which takes arguments
+function test(int x) -> void {};
+
+// Multiple function definitions in a file require 
+// variables to be scoped
+
+// Testing a function which takes no arguments
+// and returns nothing (void)
+
+//function g() -> void {
+//	var x := 2;
+//	print(x);
+//};
+
+// Calling the functions
+
+//f(1, 2, 3);
+
+//g();
+
+//w(1);

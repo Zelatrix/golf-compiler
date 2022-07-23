@@ -1,0 +1,6 @@
+print((4 mod 5) == 4);
+print((4 mod 5) != 4);
+
+print(4 mod 5 == 4);
+print(4 mod 5 != 4);
+

@@ -1,0 +1,16 @@
+// This code does not work completely, as the compiler
+// does not currently have the ability to print anything
+// but digits, so it cannot print the newline that is 
+// required to format the matrix properly. 
+
+var row := 0;
+var col := 0;
+
+while(row < 10) {
+	while(col < 10) {
+		print(col);
+		col += 1;
+	};
+	// print();
+	row += 1;
+};
