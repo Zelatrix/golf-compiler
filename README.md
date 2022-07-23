@@ -40,6 +40,9 @@ Version 0.3.3
 ---
 This version adds arrays (contiguous blocks of memory) to the compiler, and additionally, the language is transformed into a statically typed language, using manifest typing (requiring the programmer to specify the type of any new variables created).
 
+Version 0.4.0
+---
+This version of the compiler adds in a full implementation of user-defined functions. The user is now able to write functions which can be called at will to execute the code that is defined inside the function body. However, recursion is not yet supported in this version. This version of the compiler also features an improved precedence table, to improve some of the more stylistic features of the language and clean up the syntax a bit.
 
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
