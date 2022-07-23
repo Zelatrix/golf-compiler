@@ -1,6 +1,0 @@
-var x := 2;
-print(x + 3);   // 5
-print(x / 2);   // 1
-print(x * 2);   // 4
-print(x - 2);   // 0
-// print(x mod 2); // 0

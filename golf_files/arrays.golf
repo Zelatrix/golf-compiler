@@ -1,4 +1,0 @@
-// int x[3]; // C-style
-var x := array[3]; // GOLF-style 
-// array[3] := 23;
-// array[3];

@@ -1,4 +1,0 @@
-print((5 > 3) and (6 < 10));
-print((5 > 3) or (6 > 10));
-print(3 < 4 and 10 > 5 and 2 > 4);
-print(not true);

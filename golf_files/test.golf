@@ -1,7 +1,0 @@
-var x := 0;
-var y := 2;
-
-while(x < 10) {
-	print(x * y);
-	x += 1;
-};
