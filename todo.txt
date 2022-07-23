@@ -1,0 +1,26 @@
+TODO: 
+	- Extend the arithmetic operators so that they work on both variables and numerical types
+	- Implement arrays (code generation)
+		- Declaring an array
+		- Accessing an element of an array
+		- Assigning a value to a space in an array
+	- Strings 
+	- Types
+	- Pass type information to a general print() function
+		- At the moment, the print() function can only be called on 
+		  numerical types
+	
+        User-defined functions:
+        - Make all variables defined in global context (aka "main") global variables
+        - Make one LOCAL symbol table for each function
+        - Don't put local variables into global symbol table and vice-versa
+				- Parameters of functions are LOCAL variables, so they go in the LOCAL
+					symbol table
+
+DONE:
+- Lexing of `var x := array[3];`
+- Parsing of `var x := array[3];`
+- Lexing of `array[3] := 23;`
+- Parsing of `array[3] := 23;`
+- Lexing of `array[3]`
+- Parsing of `array[3]`

@@ -1,0 +1,22 @@
+- At this moment in time, functions with no arguments work correctly. Code such as 
+
+```
+function fun() {
+	var x := 2;
+	print(x);
+}
+```
+can be compiled and run successfully. Global variables are partially implemented. This branch pushes global variables to the back of the queue and focuses on implementing functions with 1 or more arguments, such as
+
+```
+function fun(x) {
+	print(x);
+}
+```
+
+- Error handling has also been improved, with dedicated error classes for each type of error, including an error to handle compilation of a file that doesn't exist, so that it becomes more obvious what the problem is. Examples of error classes include:
+
+- LexerError
+- ParserError
+- CodeGenError
+- FileNotExistsError
