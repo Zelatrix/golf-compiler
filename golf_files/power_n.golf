@@ -1,0 +1,26 @@
+function power_two_limit(float base, float limit) -> void {
+	var x := 1;
+	var y := limit;
+	while(y > 0) {
+    print(x);
+    x *= base;
+    y -= 1;
+	};
+};
+
+function power_two_inf() -> void {
+	var x := 1;
+	while(1) {
+		print(x);
+		x *= 2;
+	};
+};
+
+// function main() -> void {
+	// Calculate 2^1 ... 2^10
+	// power_two_limit(2, 10);
+power_two_inf();
+
+// };
+
+// main();

@@ -1,16 +1,26 @@
-function f(float x, float y) -> void {
-	print(x);
-	x += 1;
-	print(x);
-
-	print(y);
-	y += 2;	
-	print(y);	
+function f(float x, float y, float z) -> void {
 	
-	//print(x);	
-	//print(y);
-	// print(z);
+	print(x);
+	var a := x - 1;
+	print(a);
+	
+	print(y);
+	y += 1;
+	print(y);
+
+	print(z);
+	z += 2;	
+	print(z);	
+	
+	print(x);	
+	print(y);
+	print(z);
 };
 
-f(1, 2);
-f(3, 4);
+
+function main() {
+	f(1, 2);
+	f(3, 4);
+};
+
+main();

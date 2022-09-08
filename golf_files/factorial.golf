@@ -1,8 +1,25 @@
-// Non-recursive
-var n := 5;
-var result := 1;
-while(n > 0) {
-    result *= n;
-    n -= 1;
+// Recursive
+function factorial_rec(float n) -> void {
+   if n == 0 or n == 1 then {
+      1;
+   };
+   else {
+     n * factorial(n-1); 
+   };
 };
-print(result);
+
+// Iterative
+function factorial_loop(float n) {	
+	var result := 1;
+	while(n > 0) {
+    	result *= n;
+    	n -= 1;
+	};
+	print(result);
+};
+
+function main() {
+	factorial_rec(0);
+	factorial_rec(1);
+	factorial_rec(5);
+};

@@ -1,6 +1,9 @@
-function func(int x) -> void {
-	var y := 10;
-	y -= 1;
-	var z := y - 1;
-	func(z);
+// Recursive function
+function func(float x) -> void {
+	if x != 0 then {
+		print(x);
+		func(x-1);
+	};
 };
+
+func(10);
