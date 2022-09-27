@@ -1,0 +1,10 @@
+global x := 23;
+
+function f(int y) -> void {
+	print(x);
+	return y;
+};
+
+f(5);
+
+print(x);
