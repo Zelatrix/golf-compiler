@@ -16,9 +16,61 @@ This section defines the behaviour of the command-line arguments to the compiler
 """
 
 current_dir = os.getcwd()
-args = []
-for arg in sys.argv:
-    args.append(arg)
+args = [arg for arg in sys.argv]
+print(args)
+
+for arg in args:
+    match arg:
+        case "-g" | "--golf":
+            # Golf mode
+            # if ("--golf" in args) or ("-g" in args):
+                with open(sys.argv[1]) as f:
+                    if len(f.read()) > 5000:
+                        print("File too long!")
+                        print("In Golf mode, files must not exceed 5000 characters!")
+                        exit()
+            #print("Golf!")
+
+        case "-s" | "--shell":
+            # Shell mode
+            # if ("--shell" in args) or ("-s" in args):
+            input("golf> ")
+            # print("Shell!")
+        
+        case "-c" | "--clear":
+            # Clear
+            #if ("--clear" in args) or ("-c" in args):
+                files = (Path(f"{sys.argv[1]}.ll"), "a.exe")
+                path = Path(current_dir)
+                for file in path.glob('*'):
+                    f = file.name + file.stem
+                    if f in files:
+                        os.remove(f)
+            # print("Clear!")
+        
+        case "-h" | "--help":
+            #if ("--help" in args) or ("-h" in args):
+                args_list = "[[\"--help\", \"-h\"], [\"--clear\", \"-c\"], [\"--shell\", \"-s\"], [\"--golf\", \"-g\"]]"
+                print("python main.py <source_file> " + args_list)
+                print("""
+                    This compiler generates a file with a .ll extension in the same directory as 
+                    the source file, which must then be passed into clang to generate a runnable
+                    executable file.
+
+                    --help,  -h : list the available compiler flags
+                    --clear, -c : delete the compiled files from the previous run to generate new ones
+                    --shell, -s : enter the interpreter shell
+                    --golf,  -g : enter golf mode
+                """)
+                exit()
+            # print("Help!")
+"""
+End of command line section
+"""
+
+# args = []
+# for arg in sys.argv:
+#    args.append(arg)
 
 # Golf mode
 # if ("--golf" in args) or ("-g" in args):
@@ -32,38 +84,37 @@ for arg in sys.argv:
 # if ("--shell" in args) or ("-s" in args):
 #    input("golf> ")
 
-if ("--clear" in args) or ("-c" in args):
-    files = (Path(f"{sys.argv[1]}.ll"), "a.exe")
-    path = Path(current_dir)
-    for file in path.glob('*'):
-        f = file.name + file.stem
-        if f in files:
-            os.remove(f)
+# Clear
+#if ("--clear" in args) or ("-c" in args):
+#    files = (Path(f"{sys.argv[1]}.ll"), "a.exe")
+#    path = Path(current_dir)
+#    for file in path.glob('*'):
+#        f = file.name + file.stem
+#        if f in files:
+#            os.remove(f)
 
-if ("--help" in args) or ("-h" in args):
-    args_list = "[[\"--help\", \"-h\"], [\"--clear\", \"-c\"], [\"--shell\", \"-s\"], [\"--golf\", \"-g\"]]"
-    print("python main.py <source_file> " + args_list)
-    print("""
-        This compiler generates a file with a .ll extension in the same directory as 
-        the source file, which must then be passed into clang to generate a runnable
-        executable file.
+#if ("--help" in args) or ("-h" in args):
+#    args_list = "[[\"--help\", \"-h\"], [\"--clear\", \"-c\"], [\"--shell\", \"-s\"], [\"--golf\", \"-g\"]]"
+#    print("python main.py <source_file> " + args_list)
+#    print("""
+#        This compiler generates a file with a .ll extension in the same directory as 
+#        the source file, which must then be passed into clang to generate a runnable
+#        executable file.
 
-        --help,  -h : list the available compiler flags
-        --clear, -c : delete the compiled files from the previous run to generate new ones
-        --shell, -s : enter the interpreter shell
-        --golf,  -g : enter golf mode
-    """)
-    exit()
-"""
-End of command line section
-"""
+#        --help,  -h : list the available compiler flags
+#        --clear, -c : delete the compiled files from the previous run to generate new ones
+#        --shell, -s : enter the interpreter shell
+#        --golf,  -g : enter golf mode
+#    """)
+#    exit()
+#"""
+#End of command line section
+#"""
 
 
 # Finding the source file in the directory tree
 def find_file():
     file_arg = sys.argv[1]
-    # # print(file_arg)
-    # # print(type(file_arg))
     p = Path("golf_files")
     exists = False # Does the file exist?
     
@@ -89,14 +140,8 @@ def find_file():
 text_input = find_file()
 
 # Creating a lexer and passing the source code into it
-# try:
 lexer = Lexer().get_lexer()
 tokens = lexer.lex(text_input)
-# except LexerError:
-#     raise LexerError(f"Token is not valid!")
-
-#for tok in tokens:
-#    print(tok)
 
 # Create a code generator object
 codegen = CodeGen()
@@ -112,10 +157,6 @@ pg = Parser(module, builder, printf) # , printstr)
 pg.parse()
 parser = pg.get_parser()
 # print(parser.parse(tokens))
-
-# for tok in parser.parse(tokens):
-#     if (tok.__class__.__name__) == "FuncArgs":
-#         print(tok.a_type)
 
 # Loop through the list of statements, and evaluate each one.
 for stmt in parser.parse(tokens):
