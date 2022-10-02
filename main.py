@@ -17,41 +17,45 @@ This section defines the behaviour of the command-line arguments to the compiler
 
 current_dir = os.getcwd()
 args = [arg for arg in sys.argv]
-print(args)
+# print(args)
 
 for arg in args:
     match arg:
         case "-g" | "--golf":
             # Golf mode
-            # if ("--golf" in args) or ("-g" in args):
                 with open(sys.argv[1]) as f:
                     if len(f.read()) > 5000:
-                        print("File too long!")
-                        print("In Golf mode, files must not exceed 5000 characters!")
+                        print("""File too long! In Golf mode, files must not exceed 5000 characters!""")
                         exit()
-            #print("Golf!")
 
         case "-s" | "--shell":
             # Shell mode
-            # if ("--shell" in args) or ("-s" in args):
             input("golf> ")
-            # print("Shell!")
         
         case "-c" | "--clear":
             # Clear
-            #if ("--clear" in args) or ("-c" in args):
-                files = (Path(f"{sys.argv[1]}.ll"), "a.exe")
+                # Find the correct extension for the output file
+                os = platform.system()
+                ext = ""
+                match os:
+                    case "Linux" | "Darwin":
+                        ext += ".out"
+                    case "Windows":
+                        ext += ".exe"
+                    case _:
+                        print("OS not supported. Exiting program...")
+                        exit()
+
+                files = (Path(f"{sys.argv[1]}.ll"), f"a{ext}")
                 path = Path(current_dir)
                 for file in path.glob('*'):
-                    f = file.name + file.stem
-                    if f in files:
-                        os.remove(f)
-            # print("Clear!")
+                    full_name = file.name + file.stem
+                    if full_name in files:
+                        os.remove(full_name)
         
         case "-h" | "--help":
-            #if ("--help" in args) or ("-h" in args):
                 args_list = "[[\"--help\", \"-h\"], [\"--clear\", \"-c\"], [\"--shell\", \"-s\"], [\"--golf\", \"-g\"]]"
-                print("python main.py <source_file> " + args_list)
+                print(f"python main.py <source_file> {args_list}")
                 print("""
                     This compiler generates a file with a .ll extension in the same directory as 
                     the source file, which must then be passed into clang to generate a runnable
@@ -63,76 +67,26 @@ for arg in args:
                     --golf,  -g : enter golf mode
                 """)
                 exit()
-            # print("Help!")
 """
 End of command line section
 """
-
-# args = []
-# for arg in sys.argv:
-#    args.append(arg)
-
-# Golf mode
-# if ("--golf" in args) or ("-g" in args):
-#    with open(sys.argv[1]) as f:
-#        if len(f.read()) > 5000:
-#            print("File too long!")
-#            print("In Golf mode, files must not exceed 5000 characters!")
-#            exit()
-
-# Shell mode
-# if ("--shell" in args) or ("-s" in args):
-#    input("golf> ")
-
-# Clear
-#if ("--clear" in args) or ("-c" in args):
-#    files = (Path(f"{sys.argv[1]}.ll"), "a.exe")
-#    path = Path(current_dir)
-#    for file in path.glob('*'):
-#        f = file.name + file.stem
-#        if f in files:
-#            os.remove(f)
-
-#if ("--help" in args) or ("-h" in args):
-#    args_list = "[[\"--help\", \"-h\"], [\"--clear\", \"-c\"], [\"--shell\", \"-s\"], [\"--golf\", \"-g\"]]"
-#    print("python main.py <source_file> " + args_list)
-#    print("""
-#        This compiler generates a file with a .ll extension in the same directory as 
-#        the source file, which must then be passed into clang to generate a runnable
-#        executable file.
-
-#        --help,  -h : list the available compiler flags
-#        --clear, -c : delete the compiled files from the previous run to generate new ones
-#        --shell, -s : enter the interpreter shell
-#        --golf,  -g : enter golf mode
-#    """)
-#    exit()
-#"""
-#End of command line section
-#"""
-
 
 # Finding the source file in the directory tree
 def find_file():
     file_arg = sys.argv[1]
     p = Path("golf_files")
-    exists = False # Does the file exist?
     
-    arg_path = p / file_arg  # Convert the filename into a Path() object
     # First, check if the file exists
-    if arg_path.exists():
-        exists = True
     # If the file exists, read the file 
-    if exists:
-        for file in p.rglob("*"):
-            if file.name == file_arg:
-                parents = list(file.parents)
-                idx_0 = str(parents[0])
-                # Change directory
-                os.chdir(idx_0)
-                # Reading the source file
-                with open(file_arg) as source:
-                    return source.read()
+    for file in p.rglob("*"):
+        if file.name == file_arg:
+            parents = list(file.parents)
+            idx_0 = str(parents[0])
+            # Change directory
+            os.chdir(idx_0)
+            # Reading the source file
+            with open(file_arg) as source:
+                return source.read()
     # If the file does not exist, error
     else:
         raise FileNotExistsError("The file does not exist!")
