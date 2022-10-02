@@ -16,6 +16,7 @@ This section defines the behaviour of the command-line arguments to the compiler
 """
 
 current_dir = os.getcwd()
+# print(sys.argv)
 args = [arg for arg in sys.argv]
 # print(args)
 
@@ -25,7 +26,11 @@ for arg in args:
             # Golf mode
                 with open(sys.argv[1]) as f:
                     if len(f.read()) > 5000:
-                        print("""File too long! In Golf mode, files must not exceed 5000 characters!""")
+                        print("""
+                              File too long! In Golf mode, files must not exceed 5000 characters!
+                              The length of the file is calculated in terms of characters, and
+                              includes invisible characters such as \t, \n, and \s
+                              """)
                         exit()
 
         case "-s" | "--shell":
@@ -35,9 +40,9 @@ for arg in args:
         case "-c" | "--clear":
             # Clear
                 # Find the correct extension for the output file
-                os = platform.system()
+                op_system = platform.system()
                 ext = ""
-                match os:
+                match op_system:
                     case "Linux" | "Darwin":
                         ext += ".out"
                     case "Windows":
