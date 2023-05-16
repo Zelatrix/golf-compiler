@@ -30,10 +30,27 @@ class CodeGen(Visitor):
         global voidptr_ty
         voidptr_ty = ir.IntType(64).as_pointer()   # Change to i8 because characters are 8-bits
         # voidptr_ty = ir.IntType(8).as_pointer()
+        # fmt = "%s \n\0"
         fmt = "%lf \n\0"
-        #fmt = "%ld \n\0"
+        # fmt = "%ld \n\0"
         c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)), bytearray(fmt.encode("utf8")))
         
+        global str_fmt
+
+        str_val = "Goodbye, World!"
+        str_len = len(str_val)
+        
+        i32 = ir.IntType(32)
+        i8 = ir.IntType(8)
+
+        str_fmt_ty = ir.Constant(ir.ArrayType(i8, str_len), bytearray(str_val.encode("utf8")))
+        str_fmt = ir.GlobalVariable(self.module, str_fmt_ty.type, name=".str")
+        str_fmt.linkage = 'internal'
+        str_fmt.global_constant = True
+        str_fmt.initializer = str_fmt_ty
+        str_fmt.align = 1
+
+
         global global_fmt
         global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
         global_fmt.linkage = 'internal'
@@ -261,102 +278,39 @@ class CodeGen(Visitor):
         return self.builder.uitofp(res, ir.DoubleType())
 
     # Visitor for strings
-    #def visit_string(self, value):
-    #    return value
-                
-        # """
-        # Some useful constants
-        # """
-        # str_len = len(value)
-        # i32 = ir.IntType(32)
-        # i8 = ir.IntType(8)
-        # # str_const = bytearray(value.encode("utf-8"))
-        # # var_ty = ir.Constant(ir.ArrayType(ir.IntType(8), str_len), str_const)
-
-        # current_fn = self.builder.function   # The current function being operated on
-        # var_ty = ir.ArrayType(i8, str_len)
-        # var_alloc = self.builder.alloca(var_ty)
-        # self.builder.gep(var_alloc, [i32(0)])
-        # self.builder.ret(i32(0))
-        # self.builder.ret_void
-        # call = self.builder.call()  # tmp2 = self.builder.call(pf, [self.builder.bitcast(gbl_var, ir.IntType(8).as_pointer())], name="tmp2")
-        # gep.attributes.add("nounwind")
-        # self.builder.ret(ir.Constant(ir.IntType(32), 0))
-        # self.builder.ret_void()   # This is added unconditionally at the end so is not needed
-
-        # entry = self._create_entry_block_alloca(self.builder)
-        # print(str(self.module))
+    def visit_string(self, value):
         
-        # ptr_val = ir.ArrayType(ir.IntType(8), 15)
-        # return self.builder.gep(ptr_val, ir.IntType(32)(0))  # The getelementptr instruction
-        #                                                      # Computes the index using a pointer
-        #                                                      # to an aggregate value
+        """
+        Some useful constants
+        """
 
+        i64 = ir.IntType(64)
+        i32 = ir.IntType(32)
+        i8 = ir.IntType(8)
+        str_val = value # "Goodbye, World!"
+        str_len = len(str_val)
 
-        # The horrible errors go away once you return something from
-        # the function
+        my_array = ir.ArrayType(i8, str_len)
+        str_const = ir.Constant(my_array, bytearray(str_val.encode("utf-8")))
 
-        # current_fn = self.builder.function   # The current function being operated on
-        # self.builder.call()
-        # fnty = ir.FunctionType(i32, str_const)
-        # ir.Constant(ir.ArrayType(ir.IntType(8), str_len), str_const)
-        # self.builder.ret(i32(0)) # Return the value of 0
-        # self.builder.ret_void()
-        # return 0
-        # print(str(self.module))
-        # entry = self._create_entry_block_alloca(self.builder)
-        # print(entry)
+        i64_alloc = self.builder.alloca((i64))
+        # i32_alloc = self.builder.alloca((i32))
 
+        # self.builder.store(i32(0), i32_alloc)
+        self.builder.store(i64(0), i64_alloc)
 
-        # # print(var_ty)
-        # # print(var_ty.type)
+        mem_alloc2 = self.builder.alloca((my_array))
 
-        # gbl_var = ir.GlobalVariable(self.module, var_ty.type, name="gbl_var")
+        # GEP - calculates the address  
+        # gep = builder.gep(mem_alloc2, [i64(0)], inbounds=True, name="addr")
 
-        # # Setting up the string
-        # # gep_arg1: used as basis for calculations
-        # # gep_arg2: pointer or vector of pointers - base starting addr
+        # btc = self.builder.bitcast(str_fmt, voidptr_ty)
+        # call_print = self.builder.call(self.printstr, [btc])
 
-        # # gep_arg1 = ir.ArrayType(i8, str_len)
-        # # print(gep_arg1)
-        # # gep_arg2 = gep_arg1.as_pointer()
-        # # print(gep_arg2)
+        # return_val = builder.ret(i64(0))
+        # return_val = self.builder.ret_void()
 
-        # # gep_const1 = ir.PointerType(ir.ArrayType(i8, str_len))
-        # # gep_const2 = [ir.Constant(ir.PointerType(ir.ArrayType(i8, str_len)), gep_arg2)]
-
-        # """
-        # Defining the print function
-        # """
-        # pf_ty = ir.FunctionType(i32, [i8.as_pointer()], var_arg=True)
-        # pf = ir.Function(self.module, pf_ty, name="printf_str")
-        # print(pf)
-
-        # """
-        # Defining the main function
-        # """
-        # main_ty = ir.FunctionType(i32, (i32, i8), var_arg=False)
-        # main_fun = ir.Function(self.module, main_ty, name="main_fn")
-        # main_fun.attributes.add("nounwind")
-        # entry_bb = main_fun.append_basic_block(name="entry")
-
-        # with self.builder.goto_block(entry_bb):
-        #     # print(type(var_ty))
-        #     # vtp = var_ty
-        #     # print(vtp)
-        #     # tmp1 = self.builder.gep(var_ty, [ir.Constant(ir.IntType(32), 0), ir.Constant(ir.IntType(32), 0)])  # I don't understand how to use this instruction
-        #     # tmp2 = self.builder.call(pf, tmp1, name="tmp2")
-        #     # print(tmp1)
-        #     tmp2 = self.builder.call(pf, [self.builder.bitcast(gbl_var, ir.IntType(8).as_pointer())], name="tmp2")
-        #     tmp2.attributes.add("nounwind")
-        #     self.builder.ret(ir.Constant(ir.IntType(32), 0))
-
-        # print(main_fun)
-        # return main_fun
-
-    # Visitor for UDFs
-    # def visit_udf(self, name, args):
-    #     pass
+        # return value
 
     # Visitor for arrays (contiguous blocks of memory)
     def visit_array(self, count):
@@ -545,9 +499,10 @@ class CodeGen(Visitor):
         fmt_arg = self.builder.bitcast(global_fmt, voidptr_ty)
         self.builder.call(self.printf, [fmt_arg, value])
 
-    #def visit_print_str(self, value):
-    #    fmt_arg = self.builder.bitcast(global_fmt, voidptr_ty)
-    #    self.builder.call(self.printstr, [fmt_arg, value])
+    def visit_print_str(self, value):
+        # btc = self.builder.bitcast(str_fmt, voidptr_ty)
+        fmt_arg = self.builder.bitcast(str_fmt, voidptr_ty)
+        self.builder.call(self.printstr, [fmt_arg])
 
     # Visitor for if-then statements
     def visit_if(self, pred, body):
@@ -819,7 +774,7 @@ class CodeGen(Visitor):
         This function wraps a given value in an LLVM type
 
         Declaring the function inside another function means that
-        this function is accessible withi the scope of the outer
+        this function is accessible within the scope of the outer
         function 
         """
         def type_arg(value: int, typ):
@@ -841,20 +796,17 @@ class CodeGen(Visitor):
     # Declare the function that is used for printing text to the console.
     def _declare_print_function(self):
         voidptr_ty = ir.IntType(64).as_pointer()
-        # voidptr_ty = ir.DoubleType().as_pointer()
         printf_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
-        # printf_ty = ir.FunctionType(ir.IntType(32), [ir.IntType(8).as_pointer()], var_arg=True)
         printf = ir.Function(self.module, printf_ty, name="printf")
-        # printf.linkage = "dso_local"  # Define the linkage as dso_local
         self.printf = printf
 
     # Print for strings
-    # def _declare_str_print_function(self):
-    #      voidptr_ty = ir.IntType(8).as_pointer()
-    #      str_ty = ir.FunctionType(ir.IntType(32), [ir.IntType(8).as_pointer()], var_arg=True)
-    #      # str_ty = ir.FunctionType(ir.ArrayType(ir.IntType(8), 15), [voidptr_ty], var_arg=True)
-    #      printstr = ir.Function(self.module, str_ty, name="printstr")
-    #      self.printstr = printstr
+    #def _declare_str_print_function(self):
+    #    voidptr_ty = ir.IntType(64).as_pointer()
+    #    # printstr_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
+    #    printstr_ty = ir.FunctionType(ir.IntType(64), [voidptr_ty], var_arg=True)
+    #    printstr = ir.Function(self.module, printstr_ty, name="printstr")
+    #    self.printstr = printstr
 
     # print(self.symbol_table)
 
@@ -866,7 +818,7 @@ class CodeGen(Visitor):
 
     def save_ir(self, filename):
         # print(str(self.module))
-        # print(self.symbol_table)
+        print(self.symbol_table)
         # print(self.global_vars)
 
         # Open a file and write the IR into it

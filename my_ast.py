@@ -460,13 +460,13 @@ class Arg:
     def accept(self, visitor):
         return visitor.visit_arg(a_type, a_name)
 
-# class PrintStr:
-#      def __init__(self, builder, module, printf_str, value):
-#          self.printf_str = printf_str
-#          self.builder = builder
-#          self.module = module
-#          self.value = value
+class PrintStr:
+     def __init__(self, builder, module, printf_str, value):
+         self.printf_str = printf_str
+         self.builder = builder
+         self.module = module
+         self.value = value
 
-#      def accept(self, visitor):
-#          value = self.value.accept(visitor)
-#          return visitor.visit_print_str(value)
+     def accept(self, visitor):
+         value = self.value.accept(visitor)
+         return visitor.visit_print_str(value)

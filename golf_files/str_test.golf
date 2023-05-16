@@ -1,2 +1,8 @@
-printstr("Hello, World!");
-// print('a');
+var mystr := "Goodbye, World!";
+var myint := 2;
+
+
+// printstr("Hello, World!");
+// print("Hello, World!");
+
+// print(2);

@@ -1,7 +1,7 @@
 from rply import ParserGenerator
 
 # Types
-from my_ast import Integer, Float, Char # , String, Char
+from my_ast import Integer, Float, Char, String
 # Arithmetic 
 from my_ast import Sum, Sub, Mult, Div, Modulus
 from my_ast import UNeg
@@ -19,7 +19,7 @@ from my_ast import VarDeclaration, VarUsage, VarReassign
 # Functions
 from my_ast import Function, FunctionCall, FuncArgs, FArgsCall  # , FunParam
 # Misc
-from my_ast import Print, Return, Arg #, PrintStr
+from my_ast import Print, Return, Arg, PrintStr
 
 # from my_ast import Specification, ConjSpec, SingleSpec, Is
 
@@ -27,7 +27,7 @@ from my_ast import Print, Return, Arg #, PrintStr
 from error import ParserError
 
 class Parser:
-    def __init__(self, module, builder, printf): #, printstr):
+    def __init__(self, module, builder, printf): # , printstr):
         # The tokens accepted by the lexer
         type_decs = ["TY_INT", "TY_FLOAT", "TY_CHAR", "TY_BOOL", "TY_STRING", "TY_VOID", "RET_TY"]
         types = ["INT", "FLOAT", "STRING", "BOOL", "CHAR"]
@@ -35,7 +35,7 @@ class Parser:
         arithmetic = ["PLUS", "MINUS", "STAR", "SLASH", "MOD", "INC", "DEC", "TIMESEQ", "DIVEQ"]
         brackets = ["LEFT_BRACE", "RIGHT_BRACE", "LEFT_PAR", "RIGHT_PAR", "LEFT_CURLY", "RIGHT_CURLY"]
         comparison = ["NOT_EQUAL", "LESS_EQUAL", "GREAT_EQUAL", "EQUAL", "LESS_THAN", "GREATER_THAN"]
-        keywords = ["PRINT", "VAR", "IF", "THEN", "ELSE", "WHILE", "FUNCTION", "RETURN"]
+        keywords = ["PRINTSTR", "PRINT", "VAR", "IF", "THEN", "ELSE", "WHILE", "FUNCTION", "RETURN"]
         other = ["SEMICOLON", "COMMA", "ASSIGN", "ID"]
         arrays = ["ARRAY"]
         # verification = ["IS"]
@@ -101,9 +101,9 @@ class Parser:
         def print_statement(p):
             return Print(self.builder, self.module, self.printf, p[2])
         
-        # @self.pg.production('statement : PRINTSTR LEFT_PAR expr RIGHT_PAR')
-        # def print_string(p):
-        #     return PrintStr(self.builder, self.module, self.printstr, p[2])
+        @self.pg.production('statement : PRINTSTR LEFT_PAR expr RIGHT_PAR')
+        def print_string(p):
+            return PrintStr(self.builder, self.module, self.printstr, p[2])
 
         # Types
         @self.pg.production('type : TY_INT')
@@ -237,9 +237,9 @@ class Parser:
                 return Float(self.builder, self.module, p[0].value)
 
         # Strings
-        #@self.pg.production('expr : STRING')
-        #def string_expr(p):
-        #    return String(self.builder, self.module, p[0].value)
+        @self.pg.production('expr : STRING')
+        def string_expr(p):
+            return String(self.builder, self.module, p[0].value)
 
         # Bools
         # def bool_expr(p):

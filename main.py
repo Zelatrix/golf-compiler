@@ -111,7 +111,7 @@ printf = codegen.printf
 pg = Parser(module, builder, printf) # , printstr)
 pg.parse()
 parser = pg.get_parser()
-# print(parser.parse(tokens))
+#print(parser.parse(tokens))
 
 # for tok in parser.parse(tokens):
 #     if (tok.__class__.__name__) == "FuncArgs":
@@ -120,7 +120,7 @@ parser = pg.get_parser()
 # Loop through the list of statements, and evaluate each one.
 for stmt in parser.parse(tokens):
     codegen.visit(stmt)
-    # print(stmt)
+#    print(stmt)
 
 # Save the IR representation into an LL file
 codegen.create_ir()
