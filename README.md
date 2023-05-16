@@ -44,6 +44,10 @@ Version 0.4.0
 ---
 This version of the compiler adds in a full implementation of user-defined functions. The user is now able to write functions which can be called at will to execute the code that is defined inside the function body. However, recursion is not yet supported in this version. This version of the compiler also features an improved precedence table, to improve some of the more stylistic features of the language and clean up the syntax a bit.
 
+Version 0.4.1
+---
+This version of the compiler fully implements strings beyond just declaring then as a type in the backend, as mentioned in 0.2.1, and allows the user to create a string and save it to a variable, as well as print a string to the console. 
+
 **References**
 - https://blog.usejournal.com/writing-your-own-programming-language-and-compiler-with-python-a468970ae6df
 - https://tomassetti.me/ebnf/
