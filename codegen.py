@@ -292,6 +292,8 @@ class CodeGen(Visitor):
 
         my_array = ir.ArrayType(i8, str_len)
         str_const = ir.Constant(my_array, bytearray(str_val.encode("utf-8")))
+        
+        # return value
 
         i64_alloc = self.builder.alloca((i64))
         # i32_alloc = self.builder.alloca((i32))
@@ -310,7 +312,7 @@ class CodeGen(Visitor):
         # return_val = builder.ret(i64(0))
         # return_val = self.builder.ret_void()
 
-        # return value
+        return value
 
     # Visitor for arrays (contiguous blocks of memory)
     def visit_array(self, count):
@@ -818,7 +820,7 @@ class CodeGen(Visitor):
 
     def save_ir(self, filename):
         # print(str(self.module))
-        print(self.symbol_table)
+        # print(self.symbol_table)
         # print(self.global_vars)
 
         # Open a file and write the IR into it
