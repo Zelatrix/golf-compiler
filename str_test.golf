@@ -1,0 +1,7 @@
+// var mystr := "Goodbye, World!";
+
+print("Hello, World!");
+
+print("Goodbye, World!");
+
+// print(mystr);

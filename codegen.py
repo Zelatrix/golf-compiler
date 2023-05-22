@@ -12,7 +12,6 @@ class CodeGen(Visitor):
         self._config_llvm()
         self._create_execution_engine()
         self._declare_print_function()
-        # self._declare_str_print_function()
         self.print_initialised = False
         self.symbol_table = {}
         # print(self.symbol_table)
@@ -31,25 +30,17 @@ class CodeGen(Visitor):
         voidptr_ty = ir.IntType(64).as_pointer()   # Change to i8 because characters are 8-bits
         # voidptr_ty = ir.IntType(8).as_pointer()
         # fmt = "%s \n\0"
-        fmt = "%lf \n\0"
+        fmt = "%s"
         # fmt = "%ld \n\0"
         c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)), bytearray(fmt.encode("utf8")))
         
-        global str_fmt
+        # global str_fmt
 
-        str_val = "Goodbye, World!"
-        str_len = len(str_val)
+        # str_val = "Goodbye, World!"
+        # str_len = len(str_val)
         
         i32 = ir.IntType(32)
         i8 = ir.IntType(8)
-
-        str_fmt_ty = ir.Constant(ir.ArrayType(i8, str_len), bytearray(str_val.encode("utf8")))
-        str_fmt = ir.GlobalVariable(self.module, str_fmt_ty.type, name=".str")
-        str_fmt.linkage = 'internal'
-        str_fmt.global_constant = True
-        str_fmt.initializer = str_fmt_ty
-        str_fmt.align = 1
-
 
         global global_fmt
         global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
@@ -71,8 +62,6 @@ class CodeGen(Visitor):
         base_func = ir.Function(self.module, func_type, name="main")
         block = base_func.append_basic_block(name="entry")
         self.builder = ir.IRBuilder(block)
-        #print(base_func)
-        #print(block)
 
     def _create_execution_engine(self):
         target = self.binding.Target.from_default_triple()
@@ -128,6 +117,7 @@ class CodeGen(Visitor):
 
     # Visitor for integers
     def visit_int(self, value):
+        # self.fmt = "%lf"
         return ir.Constant(ir.DoubleType(), float(value))
         # return ir.Constant(ir.IntType(64), value)
         
@@ -287,38 +277,29 @@ class CodeGen(Visitor):
         i64 = ir.IntType(64)
         i32 = ir.IntType(32)
         i8 = ir.IntType(8)
-        str_val = value # "Goodbye, World!"
+        str_val = value[1:-1] + "\n\00" # "Goodbye, World!\00"
         str_len = len(str_val)
+
+        # fmt = "%s"
 
         my_array = ir.ArrayType(i8, str_len)
         str_const = ir.Constant(my_array, bytearray(str_val.encode("utf-8")))
-        
-        # return value
+       
+        str_const_alloc = self.builder.alloca((str_const.type), name="str_const")
+        store_str = self.builder.store(str_const, str_const_alloc)
 
-        i64_alloc = self.builder.alloca((i64))
-        # i32_alloc = self.builder.alloca((i32))
-
-        # self.builder.store(i32(0), i32_alloc)
-        self.builder.store(i64(0), i64_alloc)
-
-        mem_alloc2 = self.builder.alloca((my_array))
+        # i64_alloc = self.builder.alloca((i64), name="tmp")
+        # self.builder.store(i64(0), i64_alloc)
+        # mem_alloc2 = self.builder.alloca((my_array))
 
         # GEP - calculates the address  
         # gep = builder.gep(mem_alloc2, [i64(0)], inbounds=True, name="addr")
 
-        # btc = self.builder.bitcast(str_fmt, voidptr_ty)
-        # call_print = self.builder.call(self.printstr, [btc])
-
-        # return_val = builder.ret(i64(0))
-        # return_val = self.builder.ret_void()
-
-        return value
+        return str_const_alloc
 
     # Visitor for arrays (contiguous blocks of memory)
     def visit_array(self, count):
-        # print("Done!")  # debug info
         arr_ty = ir.ArrayType(ir.IntType(32), count)
-        # print(arr_ty)
         return self.builder.alloca(arr_ty)
 
     # Retrieve the value from that index in the specified array
@@ -803,7 +784,7 @@ class CodeGen(Visitor):
         self.printf = printf
 
     # Print for strings
-    #def _declare_str_print_function(self):
+    # def _declare_str_print_function(self):
     #    voidptr_ty = ir.IntType(64).as_pointer()
     #    # printstr_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
     #    printstr_ty = ir.FunctionType(ir.IntType(64), [voidptr_ty], var_arg=True)
